@@ -1,73 +1,87 @@
-Modern Image Gallery Application
+## Modern Image Gallery Application
+
 A full-stack, modern, and extensible image gallery web application built to replace a legacy PHP system. It features a secure Node.js backend API and a dynamic React frontend.
 
-🌟 Core Features
-Secure User Authentication: Full user registration and login system using JWT for secure sessions.
+## Core Features
 
-Modern Uploader: Drag-and-drop file uploader with support for multiple images.
+- Secure User Authentication: Full user registration and login system using JWT for secure sessions.
 
-Image Processing: Automatic thumbnail generation and EXIF data extraction on the server side.
+- Modern Uploader: Drag-and-drop file uploader with support for multiple images.
 
-Content Management: Create, view, and manage albums to organize images.
+- Image Processing: Automatic thumbnail generation and EXIF data extraction on the server side.
 
-Privacy Controls: Set images as public, private, or unlisted.
+- Content Management: Create, view, and manage albums to organize images.
 
-Responsive Design: A beautiful, responsive UI that works on all devices.
+- Privacy Controls: Set images as public, private, or unlisted.
 
-Scalable Architecture: A decoupled frontend and backend for better maintainability and scalability.
+- Responsive Design: A beautiful, responsive UI that works on all devices.
 
-🛠️ Tech Stack
-Backend: Node.js, Express.js
+- Scalable Architecture: A decoupled frontend and backend for better maintainability and scalability.
 
-Frontend: React (with Vite)
+## Tech Stack
 
-Database: PostgreSQL
+- Backend: Node.js, Express.js
 
-Authentication: JSON Web Tokens (JWT)
+- Frontend: React (with Vite)
 
-Image Handling: Multer for uploads, Sharp for processing
+- Database: PostgreSQL
 
-Styling: (Planned) Tailwind CSS for the frontend
+- Authentication: JSON Web Tokens (JWT)
 
-🚀 Getting Started
+- Image Handling: Multer for uploads, Sharp for processing
+
+- Styling: (Planned) Tailwind CSS for the frontend
+
+## Getting Started
+
 Follow these instructions to get the project running on your local machine for development and testing.
 
-Prerequisites
-Node.js (v18 or later)
+# Prerequisites
 
-npm or yarn
+- Node.js (v18 or later)
 
-PostgreSQL installed and running
+- npm or yarn
 
-A code editor like VS Code
+- PostgreSQL installed and running
 
-1. Clone the Repository
-   git https://github.com/tung-programming/Codex-Frieza-Week-2
-   cd root-directory name
+- A code editor like VS Code
 
-2. Backend Setup (server/)
-   Navigate to the server directory:
+## 1. Clone the Repository
 
+```
+git clone https://github.com/tung-programming/Codex-Frieza-Week-2
+cd WEEK-2
+```
+
+## 2. Backend Setup (server/)
+
+# 1.Navigate to the server directory:
+
+```
 cd server
+```
 
-Install dependencies:
+# 2.Install dependencies:
 
+```
 npm install
+```
 
-Set up the database:
+# 3.Set up the database:
 
-Connect to your PostgreSQL instance using a tool like pgAdmin.
+- Connect to your PostgreSQL instance using a tool like pgAdmin.
 
-Create a new database (e.g., image_gallery_db).
+- Create a new database (e.g., image_gallery_db).
 
-Run the SQL script located at server/models/db.sql to create all the necessary tables.
+- Run the SQL script located at server/models/db.sql to create all the necessary tables.
 
-Create and configure the environment file:
+# 4.Create and configure the environment file:
 
-Create a file named .env in the server/ directory.
+- Create a file named .env in the server/ directory.
 
-Copy the contents from the example below and replace the placeholders with your actual database credentials.
+- Copy the contents from the example below and replace the placeholders with your actual database credentials.
 
+```
 # Server Port
 
 PORT=5001
@@ -83,33 +97,46 @@ DB_PORT=5432 # Or the port your DB is running on
 # JWT Secret Key (generate a long, random string)
 
 JWT_SECRET=your_super_secret_jwt_key
+```
 
-Run the backend server:
+# 5.Run the backend server:
 
+```
 npm run dev
+```
 
 The API will be running at http://localhost:5001.
 
-3. Frontend Setup (client/)
-   Open a new terminal window.
+## 3. Frontend Setup (client/)
 
-Navigate to the client directory:
+# 1.Open a new terminal window.
 
+# 2.Navigate to the client directory:
+
+```
 cd client
+```
 
-Install dependencies:
+# 3.Install dependencies:
 
+```
 npm install
+```
 
-(Optional) Create an environment file: If your API is running on a different URL in production, you can create a .env file in the client/ directory.
+# 4.(Optional) Create an environment file: If your API is running on a different URL in production, you can create a .env file in the client/ directory.
 
+```
 VITE_API_URL=http://localhost:5001
+```
 
-Run the frontend development server:
+# 5.Run the frontend development server:
 
+```
 npm run dev
+```
 
 The application will open in your browser, usually at http://localhost:5173.
 
-📄 License
+## 📄 License
+
 This project is open-source and licensed under the MIT License. See the LICENSE file for more details.
