@@ -1,42 +1,47 @@
 import React from 'react';
+import {
+  BackgroundWrapper,
+  GradientBackground,
+  Orb,
+  GridOverlay,
+} from './AnimatedBackground.styled';
 
 const AnimatedBackground = ({ className = "" }) => {
   return (
-    <div className={`absolute inset-0 -z-10 ${className}`}>
-      {/* Primary gradient background */}
-      <div className="absolute inset-0 gradient-bg" />
-      
-      {/* Floating orbs for visual interest */}
-      <div className="absolute top-20 left-10 w-32 h-32 rounded-full opacity-10 animate-float" 
-           style={{ 
-             background: `radial-gradient(circle, var(--accent) 0%, transparent 70%)`,
-             animationDelay: '0s'
-           }} 
+    <BackgroundWrapper className={className}>
+      <GradientBackground />
+      <Orb
+        style={{
+          top: '5rem',
+          left: '2.5rem',
+          width: '8rem',
+          height: '8rem',
+          animationDelay: '0s',
+          background: `radial-gradient(circle, var(--accent) 0%, transparent 70%)`,
+        }}
       />
-      
-      <div className="absolute top-1/2 right-20 w-24 h-24 rounded-full opacity-10 animate-float" 
-           style={{ 
-             background: `radial-gradient(circle, var(--primary) 0%, transparent 70%)`,
-             animationDelay: '2s'
-           }} 
+      <Orb
+        style={{
+          top: '50%',
+          right: '5rem',
+          width: '6rem',
+          height: '6rem',
+          animationDelay: '2s',
+          background: `radial-gradient(circle, var(--primary) 0%, transparent 70%)`,
+        }}
       />
-      
-      <div className="absolute bottom-20 left-1/4 w-40 h-40 rounded-full opacity-10 animate-float" 
-           style={{ 
-             background: `radial-gradient(circle, var(--accent) 0%, transparent 70%)`,
-             animationDelay: '4s'
-           }} 
+      <Orb
+        style={{
+          bottom: '5rem',
+          left: '25%',
+          width: '10rem',
+          height: '10rem',
+          animationDelay: '4s',
+          background: `radial-gradient(circle, var(--accent) 0%, transparent 70%)`,
+        }}
       />
-      
-      {/* Subtle grid overlay */}
-      <div className="absolute inset-0 opacity-[0.02]"
-           style={{
-             backgroundImage: `linear-gradient(var(--text) 1px, transparent 1px),
-                              linear-gradient(90deg, var(--text) 1px, transparent 1px)`,
-             backgroundSize: '20px 20px'
-           }}
-      />
-    </div>
+      <GridOverlay />
+    </BackgroundWrapper>
   );
 };
 
