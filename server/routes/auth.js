@@ -7,4 +7,5 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/google', googleAuth);
 router.post('/forgot-password', forgotPassword);
+
 export default router;

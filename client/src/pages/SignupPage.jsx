@@ -5,402 +5,317 @@ const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async () => {
-  setError('');
   useEffect(() => {
-  // Initialize Google Sign-In
-  if (window.google) {
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-      callback: handleGoogleResponse,
-      auto_select: false,
-    });
-  }
-}, []);
-  
-  
-  // Basic client-side validation
-  if (!username || !email || !password || !confirmPassword) {
-    setError('All fields are required');
-    return;
-  }
-  
-  if (password !== confirmPassword) {
-    setError('Passwords do not match');
-    return;
-  }
-  
-  if (password.length < 6) {
-    setError('Password must be at least 6 characters long');
-    return;
-  }
-
-  setLoading(true);
-  
-  try {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, email, password }),
-    });
-    
-    const result = await response.json();
-    
-    if (response.ok) {
-      console.log('Signup successful:', result);
-      // TODO: Store token in localStorage and redirect
-      // localStorage.setItem('token', result.token);
-      // localStorage.setItem('user', JSON.stringify(result));
-    } else {
-      setError(result.message || 'Signup failed');
+    // Initialize Google Sign-In
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredentialResponse,
+        ux_mode: 'popup',
+        cancel_on_tap_outside: false
+      });
+      
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signup-button'),
+        { 
+          theme: 'outline', 
+          size: 'large',
+          width: '100%',
+          text: 'signup_with',
+          shape: 'rectangular'
+        }
+      );
     }
-  } catch (err) {
-    console.error('Signup error:', err);
-    setError('Network error. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
-const handleGoogleResponse = async (response) => {
-  try {
-    console.log('Google ID Token:', response.credential);
-    
-    // Send token to your backend
-    const backendResponse = await fetch('/api/auth/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ idToken: response.credential }),
-    });
-    
-    const result = await backendResponse.json();
-    
-    if (backendResponse.ok) {
-      console.log('Google auth successful:', result);
-      // Store token and redirect
-      localStorage.setItem('token', result.token);
-      localStorage.setItem('user', JSON.stringify(result));
-      // Redirect to dashboard/gallery
-    } else {
-      setError(result.message || 'Google authentication failed');
+  }, []);
+
+  const handleGoogleCredentialResponse = (response) => {
+    handleGoogleSignup(response.credential);
+  };
+
+  const handleGoogleSignup = async (idToken) => {
+    setGoogleLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:5001/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('Google signup successful:', data.user);
+        // TODO: Store token and redirect to dashboard
+        // localStorage.setItem('token', data.user.token);
+        // navigate('/dashboard');
+      } else {
+        setError(data.message || 'Google signup failed');
+      }
+    } catch (error) {
+      console.error('Google signup error:', error);
+      setError('Network error during Google signup');
+    } finally {
+      setGoogleLoading(false);
     }
-  } catch (err) {
-    console.error('Google auth error:', err);
-    setError('Google authentication failed');
-  }
-};
-const handleGoogleSignup = () => {
-  if (window.google) {
-    window.google.accounts.id.prompt(); // Shows Google sign-in popup
-  } else {
-    alert('Google Sign-In is not implemented yet. Stay tuned.');
-  }
-};
+  };
 
+  const handleRegularSignup = async (e) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
-  // Style constants
-  const styles = {
-    container: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '1rem',
-      margin: 0,
-      color: '#111',
-      lineHeight: 1.6,
-    },
-    signupCard: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-      padding: '2.5rem',
-      width: '100%',
-      maxWidth: '400px',
-      border: '1px solid rgba(0, 0, 0, 0.05)',
-    },
-    titleSection: {
-      textAlign: 'center',
-      marginBottom: '2rem',
-    },
-    title: {
-      fontSize: '1.75rem',
-      fontWeight: '700',
-      color: '#333',
-      margin: '0 0 0.5rem 0',
-      background: 'linear-gradient(135deg, #333 0%, #00bcd4 100%)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-    },
-    subtitle: {
-      fontSize: '0.95rem',
-      color: '#666',
-      margin: 0,
-    },
-    form: {
-      marginBottom: '1.5rem',
-    },
-    inputGroup: {
-      marginBottom: '1.25rem',
-    },
-    input: {
-      width: '100%',
-      padding: '0.875rem',
-      border: '2px solid #e0e0e0',
-      borderRadius: '8px',
-      fontSize: '1rem',
-      transition: 'all 0.3s ease',
-      outline: 'none',
-      backgroundColor: '#fafafa',
-      boxSizing: 'border-box',
-    },
-    errorMessage: {
-      color: '#e53e3e',
-      fontSize: '0.85rem',
-      marginBottom: '1rem',
-      textAlign: 'center',
-      backgroundColor: '#fed7d7',
-      padding: '0.5rem',
-      borderRadius: '6px',
-      border: '1px solid #feb2b2',
-    },
-    signupButton: {
-      width: '100%',
-      backgroundColor: '#333',
-      color: 'white',
-      padding: '0.875rem',
-      border: 'none',
-      borderRadius: '8px',
-      fontSize: '1rem',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      marginBottom: '1.5rem',
-      opacity: loading ? 0.7 : 1,
-    },
-    divider: {
-      position: 'relative',
-      textAlign: 'center',
-      margin: '1.5rem 0',
-    },
-    dividerLine: {
-      height: '1px',
-      backgroundColor: '#e0e0e0',
-      position: 'absolute',
-      top: '50%',
-      left: 0,
-      right: 0,
-    },
-    dividerText: {
-      backgroundColor: 'white',
-      color: '#999',
-      fontSize: '0.85rem',
-      padding: '0 1rem',
-      position: 'relative',
-      display: 'inline-block',
-    },
-    googleButton: {
-      width: '100%',
-      backgroundColor: 'white',
-      color: '#333',
-      padding: '0.875rem',
-      border: '2px solid #e0e0e0',
-      borderRadius: '8px',
-      fontSize: '1rem',
-      fontWeight: '500',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '0.75rem',
-      marginBottom: '2rem',
-    },
-    googleIcon: {
-      fontSize: '1.2rem',
-    },
-    footer: {
-      textAlign: 'center',
-      color: '#666',
-      fontSize: '0.95rem',
-    },
-    loginLink: {
-      color: '#00bcd4',
-      textDecoration: 'none',
-      fontWeight: '600',
-      transition: 'color 0.3s ease',
-      marginLeft: '0.25rem',
-    },
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:5001/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('Regular signup successful:', data.user);
+        // TODO: Store token and redirect
+      } else {
+        setError(data.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError('Network error during signup');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <style>
-        {`
-          .input-focus:focus {
-            border-color: #00bcd4;
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
-            background-color: white;
-          }
-          
-          .signup-button:hover:not(:disabled) {
-            background-color: #00bcd4;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
-          }
-          
-          .signup-button:disabled {
-            cursor: not-allowed;
-          }
-          
-          .google-button:hover {
-            border-color: #00bcd4;
-            box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
-            transform: translateY(-1px);
-          }
-          
-          .login-link:hover {
-            color: #0097a7;
-            text-decoration: underline;
-          }
-          
-          .signup-card {
-            animation: fadeInUp 0.6s ease-out;
-          }
-          
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          
-          @media (max-width: 480px) {
-            .signup-card {
-              padding: 1.5rem;
-              margin: 0.5rem;
-            }
-            
-            .title {
-              font-size: 1.5rem;
-            }
-            
-            .input, .signup-button, .google-button {
-              padding: 1rem;
-            }
-          }
-        `}
-      </style>
-      
-      <div style={styles.signupCard} className="signup-card">
-        {/* Title Section */}
-        <div style={styles.titleSection}>
-          <h1 style={styles.title}>Create Your Account</h1>
-          <p style={styles.subtitle}>Join the modern media gallery today.</p>
-        </div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      <div style={{
+        background: 'white',
+        borderRadius: '20px',
+        padding: '40px',
+        width: '100%',
+        maxWidth: '400px',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+      }}>
+        <h1 style={{
+          textAlign: 'center',
+          marginBottom: '30px',
+          color: '#333',
+          fontSize: '28px',
+          fontWeight: '700'
+        }}>
+          Create Account
+        </h1>
 
-        {/* Form Section */}
-        <div style={styles.form}>
-          {error && (
-            <div style={styles.errorMessage}>
-              {error}
+        {error && (
+          <div style={{
+            background: '#fee',
+            color: '#c33',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            textAlign: 'center',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Google Sign-Up Button */}
+        <div style={{ marginBottom: '20px', position: 'relative' }}>
+          <div id="google-signup-button"></div>
+          {googleLoading && (
+            <div style={{
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              right: '0',
+              bottom: '0',
+              background: 'rgba(255,255,255,0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '4px'
+            }}>
+              <div style={{
+                width: '20px',
+                height: '20px',
+                border: '2px solid #ddd',
+                borderTop: '2px solid #4285f4',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
             </div>
           )}
-          
-          <div style={styles.inputGroup}>
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-              className="input-focus"
-            />
-          </div>
-          
-          <div style={styles.inputGroup}>
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-              className="input-focus"
-            />
-          </div>
-          
-          <div style={styles.inputGroup}>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              className="input-focus"
-            />
-          </div>
-          
-          <div style={styles.inputGroup}>
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              style={styles.input}
-              className="input-focus"
-            />
-          </div>
+        </div>
 
-          {/* Submit Button */}
+        <div style={{
+          textAlign: 'center',
+          margin: '20px 0',
+          color: '#666',
+          position: 'relative'
+        }}>
+          <span style={{
+            background: 'white',
+            padding: '0 15px',
+            fontSize: '14px'
+          }}>
+            or create account with email
+          </span>
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '0',
+            right: '0',
+            height: '1px',
+            background: '#ddd',
+            zIndex: '-1'
+          }}></div>
+        </div>
+
+        {/* Regular Signup Form */}
+        <form onSubmit={handleRegularSignup}>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '15px',
+              border: '2px solid #e1e5e9',
+              borderRadius: '10px',
+              fontSize: '16px',
+              marginBottom: '15px',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'border-color 0.3s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+          />
+
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '15px',
+              border: '2px solid #e1e5e9',
+              borderRadius: '10px',
+              fontSize: '16px',
+              marginBottom: '15px',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'border-color 0.3s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '15px',
+              border: '2px solid #e1e5e9',
+              borderRadius: '10px',
+              fontSize: '16px',
+              marginBottom: '15px',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'border-color 0.3s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+          />
+
+          <input
+            type="password"
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '15px',
+              border: '2px solid #e1e5e9',
+              borderRadius: '10px',
+              fontSize: '16px',
+              marginBottom: '20px',
+              boxSizing: 'border-box',
+              outline: 'none',
+              transition: 'border-color 0.3s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+          />
+
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
-            style={styles.signupButton}
-            className="signup-button"
+            style={{
+              width: '100%',
+              padding: '15px',
+              background: loading ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s'
+            }}
           >
-            {loading ? 'Creating Account...' : 'Sign Up'}
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
-        </div>
+        </form>
 
-        {/* Divider */}
-        <div style={styles.divider}>
-          <div style={styles.dividerLine}></div>
-          <span style={styles.dividerText}>OR</span>
-        </div>
-
-        {/* Google Signup Button */}
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          style={styles.googleButton}
-          className="google-button"
-        >
-          <span style={styles.googleIcon}>🔍</span>
-          Sign Up with Google
-        </button>
-
-        {/* Footer Section */}
-        <div style={styles.footer}>
-          Already have an account?
-          <a href="/login" style={styles.loginLink} className="login-link">
-            Login
-          </a>
-        </div>
+        <p style={{
+          textAlign: 'center',
+          marginTop: '20px',
+          color: '#666'
+        }}>
+          Already have an account? <a href="/login" style={{ color: '#667eea', textDecoration: 'none' }}>Sign in</a>
+        </p>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
