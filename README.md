@@ -1,6 +1,6 @@
 ## Modern Image Gallery Application
 
-A full-stack, modern, and extensible image gallery web application built to replace a legacy PHP system. It features a secure Node.js backend API and a dynamic React frontend.
+A full-stack, modern, and extensible image gallery web application built to revamp the legacy PHP Image Gallery. It features a secure Node.js backend API and a dynamic React frontend.
 
 ## Core Features
 
@@ -50,7 +50,7 @@ Follow these instructions to get the project running on your local machine for d
 
 ```
 git clone https://github.com/tung-programming/Codex-Frieza-Week-2
-cd WEEK-2
+cd codex-frieza-week-2
 ```
 
 ## 2. Backend Setup (server/)

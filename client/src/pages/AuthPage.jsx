@@ -1,9 +1,13 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import './AuthPage.css'
 
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
+  const location = useLocation()
+const queryParams = new URLSearchParams(location.search)
+const mode = queryParams.get('mode')
+
+const [isLogin, setIsLogin] = useState(mode !== 'signup')
   const [formData, setFormData] = useState({
     username: '',
     email: '',

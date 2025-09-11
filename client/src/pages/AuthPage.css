@@ -192,7 +192,7 @@
     cursor: pointer;
     overflow: hidden;
     transition: all 0.3s ease;
-    margin-top: 1rem;
+    margin-top: 0rem;
 }
 
 .submit-btn:hover {

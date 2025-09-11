@@ -32,10 +32,10 @@ function LandingPage() {
               Secure, fast, and beautifully designed for the modern web.
             </p>
             <div className="hero-buttons">
-              <Link to="/auth" className="btn btn-primary">
+              <Link to="/auth?mode=signup" className="btn btn-primary">
                 Sign Up
               </Link>
-              <Link to="/auth" className="btn btn-secondary">
+              <Link to="/auth?mode=login" className="btn btn-secondary">
                 Login
               </Link>
             </div>
@@ -130,7 +130,7 @@ function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 PixelVault. All rights reserved.</p>
+            <p>&copy; 2025 PixelVault. All rights reserved.</p>
           </div>
         </div>
       </footer>
