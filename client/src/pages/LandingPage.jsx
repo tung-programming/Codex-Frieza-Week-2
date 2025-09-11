@@ -1,23 +1,40 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import './LandingPage.css'
 
+
 function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+const toggleMobileMenu = () => {
+  setIsMobileMenuOpen(!isMobileMenuOpen);
+};
   return (
     <div className="landing-page">
       {/* Navbar */}
       <nav className="navbar">
-        <div className="nav-container">
-          <div className="nav-brand">
-            <span className="brand-text">PixelVault</span>
-          </div>
-          <div className="nav-links">
-            <a href="#features" className="nav-link">Features</a>
-            <a href="#about" className="nav-link">About</a>
-            <a href="#contact" className="nav-link">Contact</a>
-            <Link to="/auth" className="nav-link nav-link-primary">Get Started</Link>
-          </div>
-        </div>
-      </nav>
+  <div className="nav-container">
+    <div className="nav-brand">
+      <span className="brand-text">PIXELVAULT</span>
+    </div>
+    
+    <button 
+      className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`}
+      onClick={toggleMobileMenu}
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <div className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
+      <a href="#home" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+      <a href="#features" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+      <a href="#about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>About</a>
+      <Link to="/auth" className="nav-link nav-link-primary" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
+    </div>
+  </div>
+</nav>
 
       {/* Hero Section */}
       <section className="hero-section">
@@ -49,7 +66,7 @@ function LandingPage() {
           </div>
         </div>
       </section>
-
+      
       {/* Features Section */}
       <section id="features" className="features-section">
         <div className="features-container">
@@ -100,7 +117,73 @@ function LandingPage() {
           </div>
         </div>
       </section>
-
+      {/* About Section */}
+      <section id="about" className="about-section">
+        <div className="about-container">
+          <h2 className="section-title">About PixelVault</h2>
+          <div className="about-content">
+            <div className="about-intro">
+              <p className="about-description">
+                PixelVault is a full-stack, modern, and extensible image gallery web application 
+                built to replace legacy systems. We've created a secure, scalable solution that 
+                transforms how you store and showcase your digital memories.
+              </p>
+            </div>
+            
+            <div className="about-grid">
+              <div className="about-card">
+                <h3 className="about-card-title">🏗️ Modern Architecture</h3>
+                <p className="about-card-text">
+                  Built with a decoupled frontend and backend architecture for better 
+                  maintainability and scalability. Our Node.js backend API powers a 
+                  dynamic React frontend for optimal performance.
+                </p>
+              </div>
+              
+              <div className="about-card">
+                <h3 className="about-card-title">🔧 Cutting-Edge Tech Stack</h3>
+                <ul className="tech-list">
+                  <li><strong>Backend:</strong> Node.js, Express.js</li>
+                  <li><strong>Frontend:</strong> React with Vite</li>
+                  <li><strong>Database:</strong> PostgreSQL</li>
+                  <li><strong>Authentication:</strong> JWT Tokens</li>
+                  <li><strong>Processing:</strong> Sharp & Multer</li>
+                </ul>
+              </div>
+              
+              <div className="about-card">
+                <h3 className="about-card-title">⚡ Advanced Features</h3>
+                <ul className="feature-list">
+                  <li>Secure JWT-based authentication system</li>
+                  <li>Drag-and-drop file uploader with multi-image support</li>
+                  <li>Automatic thumbnail generation and EXIF data extraction</li>
+                  <li>Album creation and management tools</li>
+                  <li>Flexible privacy controls (public, private, unlisted)</li>
+                  <li>Fully responsive design across all devices</li>
+                </ul>
+              </div>
+              
+              <div className="about-card">
+                <h3 className="about-card-title">🚀 Built for Scale</h3>
+                <p className="about-card-text">
+                  Our application is designed with scalability in mind. From secure 
+                  user authentication to efficient image processing, every component 
+                  is optimized for performance and reliability.
+                </p>
+              </div>
+            </div>
+            
+            <div className="about-mission">
+              <h3 className="mission-title">Our Mission</h3>
+              <p className="mission-text">
+                We believe your memories deserve better than outdated, clunky systems. 
+                PixelVault represents the future of digital photo management - secure, 
+                beautiful, and built for the modern web.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
@@ -116,7 +199,6 @@ function LandingPage() {
               <ul className="footer-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
                 <li><Link to="/auth">Get Started</Link></li>
               </ul>
             </div>

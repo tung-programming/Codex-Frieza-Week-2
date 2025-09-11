@@ -14,6 +14,10 @@ const [isLogin, setIsLogin] = useState(mode !== 'signup')
     password: '',
     confirmPassword: ''
   })
+  const [showPassword, setShowPassword] = useState({
+  password: false,
+  confirmPassword: false
+})
   const navigate = useNavigate()
 
   const handleInputChange = (e) => {
@@ -47,6 +51,13 @@ const [isLogin, setIsLogin] = useState(mode !== 'signup')
       confirmPassword: ''
     })
   }
+  const togglePasswordVisibility = (field) => {
+  setShowPassword(prev => ({
+    ...prev,
+    [field]: !prev[field]
+  }))
+}
+  
 
   return (
     <div className="auth-page">
@@ -87,17 +98,28 @@ const [isLogin, setIsLogin] = useState(mode !== 'signup')
                 </div>
                 
                 <div className="form-group">
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                  />
-                  <div className="input-glow"></div>
-                </div>
+  <div className="password-input-wrapper">
+    <input
+      type={showPassword.password ? "text" : "password"}
+      name="password"
+      placeholder="Password"
+      value={formData.password}
+      onChange={handleInputChange}
+      className="form-input"
+      required
+    />
+    {formData.password && (
+      <button
+        type="button"
+        className="password-toggle"
+        onClick={() => togglePasswordVisibility('password')}
+      >
+        {showPassword.password ? '🙈' : '👁️'}
+      </button>
+    )}
+  </div>
+  <div className="input-glow"></div>
+</div>
 
                 <button type="submit" className="submit-btn">
                   <span className="btn-text">LOGIN</span>
@@ -134,30 +156,52 @@ const [isLogin, setIsLogin] = useState(mode !== 'signup')
                 </div>
                 
                 <div className="form-group">
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required={!isLogin}
-                  />
-                  <div className="input-glow"></div>
-                </div>
+  <div className="password-input-wrapper">
+    <input
+      type={showPassword.password ? "text" : "password"}
+      name="password"
+      placeholder="Password"
+      value={formData.password}
+      onChange={handleInputChange}
+      className="form-input"
+      required={!isLogin}
+    />
+    {formData.password && (
+      <button
+        type="button"
+        className="password-toggle"
+        onClick={() => togglePasswordVisibility('password')}
+      >
+        {showPassword.password ? '🙈' : '👁️'}
+      </button>
+    )}
+  </div>
+  <div className="input-glow"></div>
+</div>
 
-                <div className="form-group">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Confirm Password"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required={!isLogin}
-                  />
-                  <div className="input-glow"></div>
-                </div>
+<div className="form-group">
+  <div className="password-input-wrapper">
+    <input
+      type={showPassword.confirmPassword ? "text" : "password"}
+      name="confirmPassword"
+      placeholder="Confirm Password"
+      value={formData.confirmPassword}
+      onChange={handleInputChange}
+      className="form-input"
+      required={!isLogin}
+    />
+    {formData.confirmPassword && (
+      <button
+        type="button"
+        className="password-toggle"
+        onClick={() => togglePasswordVisibility('confirmPassword')}
+      >
+        {showPassword.confirmPassword ? '🙈' : '👁️'}
+      </button>
+    )}
+  </div>
+  <div className="input-glow"></div>
+</div>
 
                 <button type="submit" className="submit-btn">
                   <span className="btn-text">SIGN UP</span>
