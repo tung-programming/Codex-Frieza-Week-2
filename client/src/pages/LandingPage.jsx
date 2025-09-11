@@ -205,9 +205,9 @@ const toggleMobileMenu = () => {
             <div className="footer-section">
               <h4 className="footer-subtitle">Connect</h4>
               <div className="social-links">
-                <a href="#" className="social-link">Twitter</a>
-                <a href="#" className="social-link">GitHub</a>
-                <a href="#" className="social-link">LinkedIn</a>
+                <a href="https://github.com/VTG56" className="social-link">Twitter</a>
+                <a href="https://github.com/tung-programming/Codex-Frieza-Week-2.git" className="social-link">GitHub</a>
+                <a href="https://linkedin.com/in/vishwaradhya-s" className="social-link">LinkedIn</a>
               </div>
             </div>
           </div>
