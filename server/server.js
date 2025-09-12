@@ -19,7 +19,8 @@ import db from './config/db.js';
 dotenv.config();
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173', // your React dev server
+  origin: 'http://localhost:5173',
+  'https://pixelvault-jpy0.onrender.com',// your React dev server
   credentials: true,
 }));
 const __filename = fileURLToPath(import.meta.url);
@@ -73,7 +74,7 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     
     const allowedOrigins = NODE_ENV === 'production' 
-      ? [process.env.FRONTEND_URL || 'https://your-production-domain.com']
+      ? [process.env.FRONTEND_URL || 'https://pixelvault-jpy0.onrender.com']
       : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
     
     if (allowedOrigins.indexOf(origin) !== -1) {

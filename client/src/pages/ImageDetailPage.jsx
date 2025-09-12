@@ -123,7 +123,7 @@ function ImageDetailPage() {
     if (!image) return;
     
     try {
-      const response = await fetch(`http://localhost:5001${image.storage_path}`);
+      const response = await fetch(`https://pixel-vault-ct82.onrender.com${image.storage_path}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

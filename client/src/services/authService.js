@@ -1,6 +1,6 @@
 // API Base Configuration
 import apiService from './api.js';
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = 'https://pixel-vault-ct82.onrender.com/api';
 
 class AuthService {
   constructor() {
