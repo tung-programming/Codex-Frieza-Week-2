@@ -93,12 +93,12 @@ class ImageService {
   }
 
   // Get image URL for display
-  getImageUrl(imagePath, baseUrl = 'https://pixel-vault-ct82.onrender.com') {
+  getImageUrl(imagePath, baseUrl = 'http://localhost:5001') {
     return `${baseUrl}${imagePath}`;
   }
 
   // Get thumbnail URL
-  getThumbnailUrl(thumbnailPath, baseUrl = 'https://pixel-vault-ct82.onrender.com') {
+  getThumbnailUrl(thumbnailPath, baseUrl = 'http://localhost:5001') {
     return `${baseUrl}${thumbnailPath}`;
   }
 

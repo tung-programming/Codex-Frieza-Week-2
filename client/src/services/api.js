@@ -1,6 +1,6 @@
 // Generic API service with JWT handling and error management
 class ApiService {
-  constructor(baseURL = 'https://pixel-vault-ct82.onrender.com/api') {
+  constructor(baseURL = 'http://localhost:5001/api') {
     this.baseURL = baseURL;
   }
 

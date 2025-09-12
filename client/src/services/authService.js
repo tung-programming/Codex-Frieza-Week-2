@@ -1,6 +1,6 @@
 // API Base Configuration
 import apiService from './api.js';
-const API_BASE = 'https://pixel-vault-ct82.onrender.com/api';
+const API_BASE = 'http://localhost:5001/api';
 
 class AuthService {
   constructor() {
@@ -137,23 +137,20 @@ class AuthService {
   }
 
   // Google OAuth login
-  // Replace the existing googleLogin method with this:
-async googleLogin(tokenData) {
+  async googleLogin(code) {
   try {
     // Client-side validation
-    if (!tokenData.idToken) {
-      throw new Error('Google access token is required');
+    if (!code) {
+      throw new Error('Google authorization code is required');
     }
 
     const response = await this.apiRequest('/auth/google', {
       method: 'POST',
-      body: JSON.stringify({ 
-        accessToken: tokenData.idToken,
-        userInfo: tokenData.userInfo
-      })
+      body: JSON.stringify({ code })
     });
 
     if (response.success) {
+      // Set auth data just like regular login
       this.setAuthData(response.user);
       return { success: true, user: response.user };
     } else {
