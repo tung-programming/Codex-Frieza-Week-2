@@ -38,8 +38,18 @@ function ProtectedRoute({ children }) {
 }
 
 // Public Route Component (redirect if already authenticated)
-// Public Route Component 
 function PublicRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  // if (isAuthenticated) {
+  //   // If already authenticated, redirect to gallery
+  //   return <Navigate to="/gallery" replace />;
+  // }
+
   return children;
 }
 

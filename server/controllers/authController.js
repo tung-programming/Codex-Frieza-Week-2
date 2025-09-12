@@ -229,6 +229,8 @@ export const getCurrentUser = async (req, res) => {
 // @desc    Google OAuth login
 // @route   POST /api/auth/google
 // @access  Public
+// In authController.js, update the googleAuth function:
+
 export const googleAuth = async (req, res) => {
   try {
     const { code } = req.body;
