@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 app.use(cors({
   origin: 'http://localhost:5173',
-  'https://pixelvault-jpy0.onrender.com',// your React dev server
+  "https://pixelvault-jpy0.onrender.com",// your React dev server
   credentials: true,
 }));
 const __filename = fileURLToPath(import.meta.url);
