@@ -18,6 +18,10 @@ import db from './config/db.js';
 // Configure environment variables
 dotenv.config();
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173', // your React dev server
+  credentials: true,
+}));
 const __filename = fileURLToPath(import.meta.url);
 // Serve uploads folder as static
 const __dirname = path.resolve();
@@ -28,10 +32,7 @@ const PORT = process.env.PORT || 5001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const allowedOrigins = ['http://localhost:5173']; // React dev server
 
-app.use(cors({
-  origin: 'http://localhost:5173', // your React dev server
-  credentials: true,
-}));
+
 // Security middleware
 app.use(helmet({
   crossOriginEmbedderPolicy: false, // Allow embedding images

@@ -32,7 +32,7 @@ class AlbumService {
   }
 
   // Set album cover image
-  async setAlbumCover(albumId, imageId) {
+  async updateAlbumThumbnail(albumId, imageId) {
     return await apiService.put(`/albums/${albumId}`, {
       cover_image_id: imageId
     });
