@@ -18,10 +18,17 @@ import db from './config/db.js';
 // Configure environment variables
 dotenv.config();
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:5173', // your React dev server
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",     // local dev
+      "http://localhost:3000",     // if CRA
+      "https://pixelvault.web.app" // deployed frontend
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  })
+);
 const __filename = fileURLToPath(import.meta.url);
 // Serve uploads folder as static
 const __dirname = path.resolve();
