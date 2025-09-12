@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import './AuthPage.css';
+import { useGoogleLogin } from '@react-oauth/google';
 
 function AuthPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const mode = queryParams.get('mode');
+  const { googleLogin } = useAuth(); 
 
   const [isLogin, setIsLogin] = useState(mode !== 'signup');
   const [formData, setFormData] = useState({
@@ -26,7 +28,7 @@ function AuthPage() {
   const { login, register, isAuthenticated, error: authError, clearError } = useAuth();
 
   // Redirect if already authenticated
- 
+  // deleted code from here
 
   // Clear auth errors when component mounts or mode changes
   useEffect(() => {
@@ -119,18 +121,22 @@ function AuthPage() {
   };
 
   const handleGoogleSignIn = useGoogleLogin({
-    // This now has logging
     onSuccess: async (codeResponse) => {
-      console.log('✅ Google login SUCCESS. Received code:', codeResponse.code);
+      console.log('âœ… Google login SUCCESS. Received code:', codeResponse.code);
       try {
-        await googleLogin(codeResponse.code);
+        const result = await googleLogin(codeResponse.code);
+        if (result.success) {
+          // Navigate to gallery after successful login
+          navigate('/gallery');
+        } else {
+          console.error('Failed to complete Google login');
+        }
       } catch (error) {
-        console.error('❌ Frontend Error: Failed to send code to backend.', error);
+        console.error('âŒ Frontend Error: Failed to send code to backend.', error);
       }
     },
-    // Also add an error handler
     onError: (error) => {
-      console.error('❌ Google login FAILED:', error);
+      console.error('âŒ Google login FAILED:', error);
     },
     flow: 'auth-code',
   });
@@ -219,7 +225,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('password')}
                       >
-                        {showPassword.password ? '🙈' : '👁️'}
+                        {showPassword.password ? 'ðŸ™ˆ' : 'ðŸ‘ï¸'}
                       </button>
                     )}
                   </div>
@@ -285,7 +291,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('password')}
                       >
-                        {showPassword.password ? '🙈' : '👁️'}
+                        {showPassword.password ? 'ðŸ™ˆ' : 'ðŸ‘ï¸'}
                       </button>
                     )}
                   </div>
@@ -311,7 +317,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('confirmPassword')}
                       >
-                        {showPassword.confirmPassword ? '🙈' : '👁️'}
+                        {showPassword.confirmPassword ? 'ðŸ™ˆ' : 'ðŸ‘ï¸'}
                       </button>
                     )}
                   </div>
