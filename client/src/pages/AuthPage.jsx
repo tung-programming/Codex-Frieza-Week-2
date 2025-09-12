@@ -229,7 +229,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('password')}
                       >
-                        {showPassword.password ? '👁️' : '🙈'}
+                        {showPassword.password ? '🙈' : '👁️'}
                       </button>
                     )}
                   </div>
@@ -295,7 +295,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('password')}
                       >
-                        {showPassword.password ? '👁️' : '🙈'}
+                        {showPassword.password ? '🙈' : '👁️'}
                       </button>
                     )}
                   </div>
@@ -321,7 +321,7 @@ function AuthPage() {
                         className="password-toggle"
                         onClick={() => togglePasswordVisibility('confirmPassword')}
                       >
-                        {showPassword.confirmPassword ? '👁️' : '🙈'}
+                        {showPassword.confirmPassword ? '🙈' : '👁️'}
                       </button>
                     )}
                   </div>
