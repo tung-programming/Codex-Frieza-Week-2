@@ -1,142 +1,309 @@
-## Modern Image Gallery Application
+# PixelVault - Modern Image Gallery Platform
 
-A full-stack, modern, and extensible image gallery web application built to revamp the legacy PHP Image Gallery. It features a secure Node.js backend API and a dynamic React frontend.
+A full-stack image gallery application with authentication, album management, and advanced search capabilities.
 
-## Core Features
+## 🚀 Features
 
-- Secure User Authentication: Full user registration and login system using JWT for secure sessions.
+- **Authentication System**: JWT-based auth with Google OAuth support
+- **Role-based Access Control**: Admin, Editor, and Visitor roles
+- **Image Management**: Upload, edit, delete, and organize images
+- **Album System**: Create and manage photo albums
+- **Advanced Search**: Search by title, caption, metadata, and tags
+- **Responsive Design**: Works on desktop and mobile devices
+- **Image Processing**: Automatic thumbnail generation and EXIF data extraction
+- **Modern UI**: Cyberpunk-themed interface with animations
 
-- Modern Uploader: Drag-and-drop file uploader with support for multiple images.
+## 🛠 Tech Stack
 
-- Image Processing: Automatic thumbnail generation and EXIF data extraction on the server side.
+### Backend
+- Node.js + Express.js
+- PostgreSQL database
+- JWT authentication
+- Bcrypt password hashing
+- Multer file upload
+- Sharp image processing
 
-- Content Management: Create, view, and manage albums to organize images.
+### Frontend
+- React 18 + Vite
+- React Router for navigation
+- Context API for state management
+- Tailwind CSS for styling
+- Responsive design
 
-- Privacy Controls: Set images as public, private, or unlisted.
+## 📋 Prerequisites
 
-- Responsive Design: A beautiful, responsive UI that works on all devices.
+- Node.js 18+ and npm 8+
+- PostgreSQL 12+
+- Git
 
-- Scalable Architecture: A decoupled frontend and backend for better maintainability and scalability.
+## 🔧 Installation
 
-## Tech Stack
+### 1. Clone the Repository
 
-- Backend: Node.js, Express.js
-
-- Frontend: React (with Vite)
-
-- Database: PostgreSQL
-
-- Authentication: JSON Web Tokens (JWT)
-
-- Image Handling: Multer for uploads, Sharp for processing
-
-- Styling: (Planned) Tailwind CSS for the frontend
-
-## Getting Started
-
-Follow these instructions to get the project running on your local machine for development and testing.
-
-# Prerequisites
-
-- Node.js (v18 or later)
-
-- npm or yarn
-
-- PostgreSQL installed and running
-
-- A code editor like VS Code
-
-## 1. Clone the Repository
-
-```
-git clone https://github.com/tung-programming/Codex-Frieza-Week-2
-cd codex-frieza-week-2
+```bash
+git clone https://github.com/tungprogramming/Codex-Frieza-Week-2.git
+cd Codex-Frieza-Week-2
 ```
 
-## 2. Backend Setup (server/)
+### 2. Backend Setup
 
-# 1.Navigate to the server directory:
-
-```
+```bash
 cd server
-```
-
-# 2.Install dependencies:
-
-```
 npm install
 ```
 
-# 3.Set up the database:
-
-- Connect to your PostgreSQL instance using a tool like pgAdmin.
-
-- Create a new database (e.g., image_gallery_db).
-
-- Run the SQL script located at server/models/db.sql to create all the necessary tables.
-
-# 4.Create and configure the environment file:
-
-- Create a file named .env in the server/ directory.
-
-- Copy the contents from the example below and replace the placeholders with your actual database credentials.
-
+Copy environment variables:
+```bash
+cp .env.example .env
 ```
-# Server Port
 
-PORT=5001
-
-# Database Connection (PostgreSQL)
-
-DB_USER=your_db_user
+Edit `.env` with your configuration:
+```env
+# Database
 DB_HOST=localhost
-DB_DATABASE=image_gallery_db
+DB_PORT=5432
+DB_USER=your_db_user
 DB_PASSWORD=your_db_password
-DB_PORT=5432 # Or the port your DB is running on
+DB_DATABASE=pixelvault
 
-# JWT Secret Key (generate a long, random string)
+# JWT Secret (generate a long random string)
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
 
-JWT_SECRET=your_super_secret_jwt_key
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
 ```
 
-# 5.Run the backend server:
+### 3. Database Setup
 
-```
-npm run dev
-```
-
-The API will be running at http://localhost:5001.
-
-## 3. Frontend Setup (client/)
-
-# 1.Open a new terminal window.
-
-# 2.Navigate to the client directory:
-
-```
-cd client
+Create PostgreSQL database:
+```sql
+CREATE DATABASE pixelvault;
 ```
 
-# 3.Install dependencies:
-
+Run the database migration:
+```bash
+psql -U your_db_user -d pixelvault -f db.sql
 ```
+
+### 4. Frontend Setup
+
+```bash
+cd ../client
 npm install
 ```
 
-# 4.(Optional) Create an environment file: If your API is running on a different URL in production, you can create a .env file in the client/ directory.
-
+Create frontend environment file:
+```bash
+echo "VITE_API_URL=http://localhost:5001" > .env
 ```
-VITE_API_URL=http://localhost:5001
-```
 
-# 5.Run the frontend development server:
+### 5. Start the Application
 
-```
+**Backend** (from `/server` directory):
+```bash
 npm run dev
 ```
 
-The application will open in your browser, usually at http://localhost:5173.
+**Frontend** (from `/client` directory):
+```bash
+npm run dev
+```
+
+Visit `http://localhost:5173` in your browser.
+
+## 👤 Default Users
+
+The database migration creates these test accounts:
+
+| Username | Email | Password | Role |
+|----------|--------|----------|------|
+| admin | admin@pixelvault.com | admin123 | Admin |
+| editor | editor@pixelvault.com | editor123 | Editor |
+| visitor | visitor@pixelvault.com | visitor123 | Visitor |
+
+**⚠️ Change these passwords in production!**
+
+## 📁 Project Structure
+
+```
+pixelvault/
+├── server/                 # Backend API
+│   ├── controllers/       # Route controllers
+│   ├── middleware/        # Auth & validation middleware
+│   ├── routes/           # API routes
+│   ├── config/           # Database configuration
+│   ├── uploads/          # Uploaded images
+│   └── server.js         # Main server file
+├── client/               # Frontend React app
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── pages/        # Page components
+│   │   ├── context/      # React Context (state)
+│   │   ├── hooks/        # Custom React hooks
+│   │   └── services/     # API service classes
+└── README.md
+```
+
+## 🔒 Authentication & Permissions
+
+### Roles
+- **Visitor**: Read-only access, can view public images
+- **Editor**: Can upload, edit, and delete their own content
+- **Admin**: Full access to all content and users
+
+### Protected Routes
+- Authentication required for `/gallery`, `/albums`, `/images/:id`
+- Role-based permissions enforced on backend
+- JWT tokens expire after 7 days
+
+## 📱 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/google` - Google OAuth login
+- `GET /api/auth/me` - Get current user
+- `PUT /api/auth/change-password` - Change password
+
+### Images
+- `GET /api/images` - Get images with filters
+- `POST /api/images` - Upload images (auth required)
+- `GET /api/images/:id` - Get single image
+- `PUT /api/images/:id` - Update image (auth required)
+- `DELETE /api/images/:id` - Delete image (auth required)
+
+### Albums
+- `GET /api/albums` - Get all albums
+- `POST /api/albums` - Create album (auth required)
+- `GET /api/albums/:id` - Get album with images
+- `PUT /api/albums/:id` - Update album (auth required)
+- `DELETE /api/albums/:id` - Delete album (auth required)
+
+## 🚀 Deployment
+
+### Backend Deployment
+1. Set `NODE_ENV=production`
+2. Configure production database
+3. Set strong JWT secret
+4. Configure CORS for your domain
+5. Use process manager (PM2)
+
+### Frontend Deployment
+1. Build the frontend:
+   ```bash
+   cd client && npm run build
+   ```
+2. Serve the `dist` folder with your web server
+3. Configure environment variables for production API
+
+### Environment Variables for Production
+```env
+NODE_ENV=production
+PORT=5001
+DB_HOST=your_production_db_host
+JWT_SECRET=your_super_secure_production_jwt_secret
+FRONTEND_URL=https://your-domain.com
+```
+
+## 🧪 Development
+
+### Backend Development
+```bash
+cd server
+npm run dev  # Uses nodemon for auto-reload
+```
+
+### Frontend Development
+```bash
+cd client
+npm run dev  # Vite dev server with HMR
+```
+
+### Database Migrations
+When you modify the database schema, update `db.sql` and re-run:
+```bash
+psql -U your_db_user -d pixelvault -f db.sql
+```
+
+## 🔧 Configuration
+
+### File Upload Limits
+- Max file size: 10MB per image
+- Supported formats: JPEG, PNG, WebP, AVIF, GIF
+- Automatic thumbnail generation
+- EXIF data extraction
+
+### Image Processing
+- Thumbnails: 400x400px (max)
+- Original images preserved
+- Sharp library for fast processing
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Database Connection Error**
+```
+Error: ENOTFOUND localhost
+```
+- Check PostgreSQL is running
+- Verify database credentials in `.env`
+- Ensure database exists
+
+**JWT Secret Error**
+```
+Error: secretOrPrivateKey is required
+```
+- Set `JWT_SECRET` in `.env`
+- Make it at least 32 characters long
+
+**File Upload Error**
+```
+Error: ENOENT: no such file or directory, open 'uploads/...'
+```
+- Ensure `uploads` directory exists in server folder
+- Check file permissions
+
+**CORS Error**
+```
+Access to fetch at 'http://localhost:5001' from origin 'http://localhost:5173' has been blocked by CORS policy
+```
+- Ensure backend is running on port 5001
+- Check CORS configuration in server.js
+
+## 📖 API Documentation
+
+Visit `http://localhost:5001/api/docs` when the server is running for interactive API documentation.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
-This project is open-source and licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See LICENSE file for details.
+
+## 🙋‍♂️ Support
+
+If you encounter any issues:
+1. Check the troubleshooting section
+2. Review the logs in terminal
+3. Check database connectivity
+4. Verify environment variables
+
+## 🔮 Future Features (Placeholders)
+
+- **AI Image Generation**: Generate images using AI models
+- **Custom Color Palette**: Extract and display color palettes from images  
+- **Vector Search**: Semantic search using image embeddings
+- **Social Features**: Comments, likes, and sharing
+- **Advanced EXIF**: Detailed camera metadata display
+- **Cloud Storage**: AWS S3 or Cloudinary integration
+
+---
+
+**Happy coding! 📸✨**

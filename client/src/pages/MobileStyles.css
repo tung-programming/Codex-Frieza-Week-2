@@ -1,0 +1,461 @@
+/* Mobile-First Responsive Styles */
+
+/* Base styles are mobile-first in SharedStyles.css */
+/* These are additional mobile-specific enhancements */
+
+/* Touch-friendly interactions */
+@media (max-width: 768px) {
+  /* Increase touch targets */
+  .btn {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Stack header actions vertically on mobile */
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  /* Full-width buttons on mobile */
+  .header-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Single column grid for stats */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Single column gallery grid on mobile */
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Image detail responsive layout */
+  .image-detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  
+  /* Modal improvements for mobile */
+  .modal {
+    margin: 0.5rem;
+    max-height: 95vh;
+    width: calc(100% - 1rem);
+  }
+  
+  .modal-header {
+    padding: 1rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .modal-footer .btn {
+    width: 100%;
+  }
+  
+  /* Upload queue improvements */
+  .upload-queue-item {
+    grid-template-columns: 60px 1fr !important;
+  }
+  
+  .upload-queue-form {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Form improvements */
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Touch-friendly overlay buttons */
+  .image-card-overlay .btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+  
+  /* Lightbox improvements for mobile */
+  .lightbox-navigation {
+    padding: 1rem;
+    font-size: 2rem;
+  }
+  
+  /* Page container padding */
+  .page-container > div {
+    padding: 1rem;
+  }
+  
+  /* Card spacing */
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  /* Search bar improvements */
+  .search-filter-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  /* Even smaller touch targets adjustment */
+  .btn {
+    font-size: 0.875rem;
+    padding: 0.625rem 0.875rem;
+  }
+  
+  /* Header improvements */
+  .header-container {
+    padding: 0 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .brand-logo {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .page-title {
+    font-size: 1.125rem;
+    text-align: center;
+  }
+  
+  /* Stats improvements */
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  /* Modal improvements */
+  .modal-title {
+    font-size: 1.125rem;
+  }
+  
+  .modal {
+    margin: 0.25rem;
+    width: calc(100% - 0.5rem);
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 0.75rem;
+  }
+  
+  /* Upload queue mobile layout */
+  .upload-queue-item {
+    padding: 0.75rem;
+  }
+  
+  .upload-queue-preview {
+    width: 50px;
+    height: 50px;
+  }
+  
+  /* Form improvements for small screens */
+  .form-label {
+    font-size: 0.8rem;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-select {
+    padding: 0.625rem;
+    font-size: 16px;
+  }
+  
+  /* Image card improvements */
+  .image-card-content {
+    padding: 0.75rem;
+  }
+  
+  .image-card-title {
+    font-size: 0.9rem;
+  }
+  
+  .image-card-caption {
+    font-size: 0.8rem;
+  }
+  
+  .image-card-meta {
+    font-size: 0.7rem;
+  }
+  
+  /* Empty state improvements */
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+  }
+  
+  .empty-state-title {
+    font-size: 1.25rem;
+  }
+  
+  .empty-state-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Adjust header for landscape */
+  .page-header {
+    padding: 0.5rem 0;
+  }
+  
+  .header-container {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .header-actions {
+    flex-direction: row;
+    width: auto;
+  }
+  
+  .header-actions .btn {
+    width: auto;
+  }
+  
+  /* Compact stats for landscape */
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  /* Gallery adjustments */
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet specific styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Two column layout for image detail */
+  .image-detail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  /* Three column gallery */
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Stats in 2x2 grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Modal sizing for tablet */
+  .modal {
+    max-width: 600px;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1025px) {
+  /* Four+ column gallery */
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  
+  /* Full stats row */
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Larger modals */
+  .modal {
+    max-width: 800px;
+  }
+  
+  /* Upload modal specific sizing */
+  .upload-modal {
+    max-width: 900px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .brand-logo,
+  .page-title,
+  .card-title {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Dark mode support (system preference) */
+@media (prefers-color-scheme: dark) {
+  /* Already using dark theme, but ensure proper contrast */
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.2);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Keep essential grid animation but reduce it */
+  .page-container::before {
+    animation: none;
+  }
+}
+
+/* Touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects for touch devices */
+  .image-card-overlay {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  .card:hover {
+    transform: none;
+  }
+  
+  /* Larger touch targets */
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .modal-close {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .page-container::before {
+    display: none;
+  }
+  
+  .page-header,
+  .header-actions,
+  .modal-overlay,
+  .image-card-overlay {
+    display: none !important;
+  }
+  
+  .page-container {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .card,
+  .stat-card {
+    border: 1px solid #ccc !important;
+    background: white !important;
+    color: black !important;
+    break-inside: avoid;
+  }
+  
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-contrast: high) {
+  .card,
+  .stat-card,
+  .image-card {
+    border-width: 2px;
+    border-color: var(--primary-cyan);
+  }
+  
+  .btn {
+    border-width: 2px;
+  }
+  
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    outline: 3px solid var(--primary-cyan);
+    outline-offset: 2px;
+  }
+}
+
+/* Loading states for slow connections */
+.image-card img[loading="lazy"] {
+  background: linear-gradient(90deg, 
+    rgba(0, 242, 254, 0.1) 0%, 
+    rgba(0, 242, 254, 0.2) 50%, 
+    rgba(0, 242, 254, 0.1) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Drag and drop visual feedback */
+.drag-over {
+  border-color: var(--primary-cyan) !important;
+  background-color: rgba(0, 242, 254, 0.1) !important;
+  transform: scale(1.02);
+}

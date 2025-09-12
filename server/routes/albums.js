@@ -4,23 +4,20 @@ import {
   getAlbums,
   getAlbumById,
   updateAlbum,
-  deleteAlbum,
-  addImageToAlbum,
+  deleteAlbum
 } from '../controllers/albumController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, optionalAuth, editorOrAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Routes
 router.route('/')
-  .get(getAlbums)
-  .post(protect, createAlbum);
+  .get(optionalAuth, getAlbums)
+  .post(protect, editorOrAdmin, createAlbum);
 
 router.route('/:id')
-  .get(getAlbumById)
+  .get(optionalAuth, getAlbumById)
   .put(protect, updateAlbum)
   .delete(protect, deleteAlbum);
-
-router.route('/:id/images')
-  .post(protect, addImageToAlbum);
 
 export default router;

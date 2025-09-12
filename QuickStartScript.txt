@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# PixelVault Quick Setup Script
+echo "🚀 Setting up PixelVault..."
+
+# Check if required tools are installed
+command -v node >/dev/null 2>&1 || { echo "❌ Node.js is required but not installed. Aborting." >&2; exit 1; }
+command -v npm >/dev/null 2>&1 || { echo "❌ npm is required but not installed. Aborting." >&2; exit 1; }
+command -v psql >/dev/null 2>&1 || { echo "❌ PostgreSQL is required but not installed. Aborting." >&2; exit 1; }
+
+echo "✅ Prerequisites check passed"
+
+# Setup backend
+echo "📦 Installing backend dependencies..."
+cd server
+npm install
+
+if [ ! -f .env ]; then
+    echo "📝 Creating backend environment file..."
+    cp .env.example .env
+    echo "⚠️  Please edit server/.env with your database credentials and JWT secret"
+fi
+
+# Setup frontend
+echo "📦 Installing frontend dependencies..."
+cd ../client
+npm install
+
+if [ ! -f .env ]; then
+    echo "📝 Creating frontend environment file..."
+    echo "VITE_API_URL=http://localhost:5001" > .env
+fi
+
+echo "✅ Installation complete!"
+echo ""
+echo "🔧 Next steps:"
+echo "1. Edit server/.env with your database configuration"
+echo "2. Create database: CREATE DATABASE pixelvault;"
+echo "3. Run database migration: psql -U username -d pixelvault -f server/db.sql"
+echo "4. Start backend: cd server && npm run dev"
+echo "5. Start frontend: cd client && npm run dev"
+echo ""
+echo "🌐 Access the app at: http://localhost:5173"
+echo "📚 API docs at: http://localhost:5001/api/docs"
+echo ""
+echo "Default login: admin@pixelvault.com / admin123"

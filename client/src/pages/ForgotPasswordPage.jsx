@@ -298,7 +298,7 @@ const handleSubmit = async (e) => {
         {/* Footer Links */}
         <div style={styles.footer}>
           <div style={styles.linkRow} className="link-row">
-            <a href="/login" style={styles.backLink} className="back-link">
+            <a href="/auth" style={styles.backLink} className="back-link">
               ← Back to Login
             </a>
           </div>
