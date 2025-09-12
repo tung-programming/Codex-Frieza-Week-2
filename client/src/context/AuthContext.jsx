@@ -194,37 +194,38 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const googleLogin = useCallback(async (code) => {
-    try {
-      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
-  
-      const response = await authService.googleLogin(code);
-      
-      if (response.success) {
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-          payload: {
-            user: response.user,
-            token: response.user.token // Use token from response.user
-          }
-        });
-        return { success: true };
-      } else {
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_FAILURE,
-          payload: response.message || 'Google login failed'
-        });
-        return { success: false, message: response.message };
-      }
-    } catch (error) {
-      const errorMessage = error.message || 'Google login failed';
+  // Replace the existing googleLogin function with this:
+const googleLogin = useCallback(async (tokenData) => {
+  try {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+
+    const response = await authService.googleLogin(tokenData);
+    
+    if (response.success) {
+      dispatch({
+        type: AUTH_ACTIONS.LOGIN_SUCCESS,
+        payload: {
+          user: response.user,
+          token: response.user.token
+        }
+      });
+      return { success: true };
+    } else {
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
-        payload: errorMessage
+        payload: response.message || 'Google login failed'
       });
-      return { success: false, message: errorMessage };
+      return { success: false, message: response.message };
     }
-  }, []);
+  } catch (error) {
+    const errorMessage = error.message || 'Google login failed';
+    dispatch({
+      type: AUTH_ACTIONS.LOGIN_FAILURE,
+      payload: errorMessage
+    });
+    return { success: false, message: errorMessage };
+  }
+}, []);
 
   const logout = useCallback(() => {
     authService.logout();

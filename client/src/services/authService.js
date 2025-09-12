@@ -137,30 +137,33 @@ class AuthService {
   }
 
   // Google OAuth login
-  async googleLogin(code) {
-    try {
-      // Client-side validation
-      if (!code) {
-        throw new Error('Google authorization code is required');
-      }
-  
-      const response = await this.apiRequest('/auth/google', {
-        method: 'POST',
-        body: JSON.stringify({ code })
-      });
-  
-      if (response.success) {
-        // Set auth data just like regular login
-        this.setAuthData(response.user);
-        return { success: true, user: response.user };
-      } else {
-        throw new Error(response.message || 'Google login failed');
-      }
-    } catch (error) {
-      console.error('Google login error:', error);
-      return { success: false, message: error.message };
+  // Replace the existing googleLogin method with this:
+async googleLogin(tokenData) {
+  try {
+    // Client-side validation
+    if (!tokenData.idToken) {
+      throw new Error('Google access token is required');
     }
+
+    const response = await this.apiRequest('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        accessToken: tokenData.idToken,
+        userInfo: tokenData.userInfo
+      })
+    });
+
+    if (response.success) {
+      this.setAuthData(response.user);
+      return { success: true, user: response.user };
+    } else {
+      throw new Error(response.message || 'Google login failed');
+    }
+  } catch (error) {
+    console.error('Google login error:', error);
+    return { success: false, message: error.message };
   }
+}
 
   // Get current user
   async getCurrentUser() {

@@ -233,34 +233,28 @@ export const getCurrentUser = async (req, res) => {
 
 export const googleAuth = async (req, res) => {
   try {
-    const { code } = req.body;
+    const { accessToken, userInfo } = req.body;
 
-    if (!code) {
+    if (!accessToken || !userInfo) {
       return res.status(400).json({
         success: false,
-        message: 'Google authorization code is required'
+        message: 'Google access token and user info are required'
       });
     }
 
-    // Set up OAuth2Client
-    const client = new OAuth2Client(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      'postmessage' // Important for auth-code flow
-    );
+    // Verify the access token with Google
+    const verifyResponse = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
+    const tokenInfo = await verifyResponse.json();
 
-    // Exchange code for tokens
-    const { tokens } = await client.getToken(code);
-    const idToken = tokens.id_token;
+    if (!verifyResponse.ok || tokenInfo.error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Google access token'
+      });
+    }
 
-    // Verify the ID token
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    const { email, name, picture } = userInfo;
+    const googleId = userInfo.id;
 
     if (!email) {
       return res.status(400).json({
@@ -316,7 +310,7 @@ export const googleAuth = async (req, res) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profile_picture,
-        token: token  // Include token in user object
+        token: token
       }
     });
 

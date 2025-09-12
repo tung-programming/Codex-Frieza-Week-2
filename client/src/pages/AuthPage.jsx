@@ -124,26 +124,34 @@ function AuthPage() {
     }
   };
 
-  const handleGoogleSignIn = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
-      console.log('âœ… Google login SUCCESS. Received code:', codeResponse.code);
-      try {
-        const result = await googleLogin(codeResponse.code);
-        if (result.success) {
-          // Navigate to gallery after successful login
-          navigate('/gallery');
-        } else {
-          console.error('Failed to complete Google login');
-        }
-      } catch (error) {
-        console.error('âŒ Frontend Error: Failed to send code to backend.', error);
+  // Replace the existing handleGoogleSignIn with this:
+const handleGoogleSignIn = useGoogleLogin({
+  onSuccess: async (tokenResponse) => {
+    console.log('✅ Google login SUCCESS. Received token:', tokenResponse.access_token);
+    try {
+      // Get user info from Google using the access token
+      const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.access_token}`);
+      const userInfo = await userInfoResponse.json();
+      
+      const result = await googleLogin({
+        idToken: tokenResponse.access_token,
+        userInfo: userInfo
+      });
+      
+      if (result.success) {
+        navigate('/gallery');
+      } else {
+        console.error('Failed to complete Google login');
       }
-    },
-    onError: (error) => {
-      console.error('âŒ Google login FAILED:', error);
-    },
-    flow: 'auth-code',
-  });
+    } catch (error) {
+      console.error('❌ Frontend Error: Failed to process Google login.', error);
+    }
+  },
+  onError: (error) => {
+    console.error('❌ Google login FAILED:', error);
+  },
+  // Remove the flow: 'auth-code' line - use default implicit flow
+});
 
   const toggleMode = () => {
     setIsLogin(!isLogin);

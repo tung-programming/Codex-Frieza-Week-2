@@ -50,7 +50,12 @@ app.use(helmet({
     },
   },
 }));
-
+// Add this after the helmet middleware configuration:
+app.use((req, res, next) => {
+  res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.header('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  next();
+});
 // Compression middleware
 app.use(compression());
 
