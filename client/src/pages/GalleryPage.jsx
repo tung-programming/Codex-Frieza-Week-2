@@ -119,7 +119,7 @@ function GalleryPage() {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/auth');
+    navigate('/');
   };
 
   // File selection handler

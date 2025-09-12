@@ -294,7 +294,8 @@ ORDER BY a.created_at DESC;
 ALTER TABLE images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE albums ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
-
+ALTER TABLE users ADD COLUMN profile_picture_url VARCHAR(255);
+ALTER TABLE users ADD COLUMN auth_provider VARCHAR(255);
 -- Images policies
 --CREATE POLICY "Public images are viewable by everyone" ON images
  --   FOR SELECT USING (privacy = 'public');

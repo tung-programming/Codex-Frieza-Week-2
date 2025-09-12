@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import authService from '../services/AuthService.js';
+import authService from '../services/authService.js';
 
 // Initial state
 const initialState = {
@@ -117,7 +117,9 @@ export const AuthProvider = ({ children }) => {
           // No existing auth
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
-      } catch (error) {
+      }
+      
+      catch (error) {
         console.error('Auth initialization error:', error);
         authService.clearAuth();
         dispatch({ type: AUTH_ACTIONS.LOGOUT });

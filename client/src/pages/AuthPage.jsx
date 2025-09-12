@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import './AuthPage.css';
+import { useGoogleLogin } from '@react-oauth/google';
 
 function AuthPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const mode = queryParams.get('mode');
+  const { googleLogin } = useAuth(); 
 
   const [isLogin, setIsLogin] = useState(mode !== 'signup');
   const [formData, setFormData] = useState({
@@ -122,12 +124,22 @@ function AuthPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google OAuth
-    console.log('Google Sign-In clicked - Not implemented yet');
-    // For now, just show an alert
-    alert('Google Sign-In is not implemented yet. Please use email/password authentication.');
-  };
+  const handleGoogleSignIn = useGoogleLogin({
+    // This now has logging
+    onSuccess: async (codeResponse) => {
+      console.log('✅ Google login SUCCESS. Received code:', codeResponse.code);
+      try {
+        await googleLogin(codeResponse.code);
+      } catch (error) {
+        console.error('❌ Frontend Error: Failed to send code to backend.', error);
+      }
+    },
+    // Also add an error handler
+    onError: (error) => {
+      console.error('❌ Google login FAILED:', error);
+    },
+    flow: 'auth-code',
+  });
 
   const toggleMode = () => {
     setIsLogin(!isLogin);

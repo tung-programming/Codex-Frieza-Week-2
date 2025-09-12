@@ -1,4 +1,5 @@
 // API Base Configuration
+import apiService from './api.js';
 const API_BASE = 'http://localhost:5001/api';
 
 class AuthService {
@@ -136,27 +137,12 @@ class AuthService {
   }
 
   // Google OAuth login
-  async googleLogin(idToken) {
-    try {
-      if (!idToken) {
-        throw new Error('Google ID token is required');
-      }
-
-      const response = await this.apiRequest('/auth/google', {
-        method: 'POST',
-        body: JSON.stringify({ idToken })
-      });
-
-      if (response.success) {
-        this.setAuthData(response.user);
-        return { success: true, user: response.user };
-      } else {
-        throw new Error(response.message || 'Google login failed');
-      }
-    } catch (error) {
-      console.error('Google login error:', error);
-      return { success: false, message: error.message };
+  async googleLogin(code) {
+    const response = await apiService.post('/auth/google', { code });
+    if (response.success) {
+      this.setAuth(response.token, response.user);
     }
+    return response;
   }
 
   // Get current user
