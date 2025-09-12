@@ -18,11 +18,17 @@ import db from './config/db.js';
 // Configure environment variables
 dotenv.config();
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:5173',
-  "https://pixelvault-jpy0.onrender.com",// your React dev server
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",              // local dev
+      "http://localhost:3000",              // if CRA
+      "https://pixelvault-jpy0.onrender.com" // deployed frontend on Render
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  })
+);
 const __filename = fileURLToPath(import.meta.url);
 // Serve uploads folder as static
 const __dirname = path.resolve();
