@@ -19,6 +19,8 @@ function AlbumsPage() {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [albumImages, setAlbumImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
+  const [showThumbnailModal, setShowThumbnailModal] = useState(false);
+  const [thumbnailAlbum, setThumbnailAlbum] = useState(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -137,6 +139,52 @@ function AlbumsPage() {
     }
   };
 
+  const openThumbnailModal = (album) => {
+    setThumbnailAlbum(album);
+    // We already load images when an album is opened, so they should be available
+    if (selectedAlbum?.id === album.id && albumImages.length > 0) {
+      setShowThumbnailModal(true);
+    } else {
+      // If images aren't loaded, load them first then show the modal
+      loadAlbumImages(album.id).then(() => {
+        setShowThumbnailModal(true);
+      });
+    }
+  };
+
+  // Close thumbnail selection modal
+  const closeThumbnailModal = () => {
+    setShowThumbnailModal(false);
+    setThumbnailAlbum(null);
+  };
+
+  // Handle the actual thumbnail update
+  const handleThumbnailUpdate = async (imageId) => {
+    if (!thumbnailAlbum) return;
+
+    try {
+      const response = await albumService.updateAlbumThumbnail(thumbnailAlbum.id, imageId);
+
+      if (response.success) {
+        // Update the album in the main 'albums' state
+        setAlbums(albums.map(album =>
+          album.id === thumbnailAlbum.id ? response.album : album
+        ));
+
+        // If the updated album is the currently selected one, update its state too
+        if (selectedAlbum?.id === thumbnailAlbum.id) {
+          setSelectedAlbum(response.album);
+        }
+        
+        closeThumbnailModal();
+        setError(null);
+      } else {
+        setError(response.message || 'Failed to update thumbnail');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update thumbnail');
+    }
+  };
   // Open album and load images
   const openAlbum = (album) => {
     setSelectedAlbum(album);
@@ -275,12 +323,22 @@ function AlbumsPage() {
                   
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {canEdit(selectedAlbum.created_by) && (
+                      <>
                       <button
                         onClick={() => startEditingAlbum(selectedAlbum)}
                         className="btn btn-secondary"
                       >
                         Edit
                       </button>
+                      <button
+                      onClick={() => openThumbnailModal(selectedAlbum)}
+                      className="btn btn-secondary"
+                      disabled={albumImages.length === 0}
+                      title={albumImages.length === 0 ? "Add images to the album to set a thumbnail" : "Change album thumbnail"}
+                    >
+                      Edit Thumbnail
+                        </button>
+                        </>
                     )}
                     <button
                       onClick={closeAlbum}
@@ -453,7 +511,57 @@ function AlbumsPage() {
             )}
           </div>
         )}
-
+        {/* Thumbnail Selection Modal */}
+      {showThumbnailModal && thumbnailAlbum && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: '80vw' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">Select Thumbnail for "{thumbnailAlbum.name}"</h3>
+              <button onClick={closeThumbnailModal} className="modal-close">×</button>
+            </div>
+            <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              {loadingImages ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading images...</div>
+              ) : albumImages.length > 0 ? (
+                <div className="gallery-grid">
+                  {albumImages.map((image) => (
+                    <div
+                      key={image.id}
+                      className="image-card"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleThumbnailUpdate(image.id)}
+                    >
+                      <div className="image-card-image">
+                        <img
+                          src={imageService.getThumbnailUrl(image.thumbnail_path)}
+                          alt={image.alt_text || image.title}
+                          loading="lazy"
+                        />
+                        <div className="image-card-overlay">
+                          <p>Select as Thumbnail</p>
+                        </div>
+                      </div>
+                      <div className="image-card-content">
+                        <h4 className="image-card-title">{image.title}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <h3 className="empty-state-title">No Images Available</h3>
+                  <p className="empty-state-text">This album doesn't contain any images to select as a thumbnail.</p>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button type="button" onClick={closeThumbnailModal} className="btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         {/* Create/Edit Album Modal */}
         {(showCreateModal || editingAlbum) && (
           <div className="modal-overlay">
