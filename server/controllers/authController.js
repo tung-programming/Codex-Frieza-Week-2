@@ -231,29 +231,31 @@ export const getCurrentUser = async (req, res) => {
 // @access  Public
 export const googleAuth = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { code } = req.body;
 
-    if (!idToken) {
+    if (!code) {
       return res.status(400).json({
         success: false,
-        message: 'Google ID token is required'
+        message: 'Google authorization code is required'
       });
     }
 
-    // Verify the Google ID token
-    let ticket;
-    try {
-      ticket = await client.verifyIdToken({
-        idToken: idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-    } catch (error) {
-      console.error('Google token verification failed:', error);
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid Google token'
-      });
-    }
+    // Set up OAuth2Client
+    const client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      'postmessage' // Important for auth-code flow
+    );
+
+    // Exchange code for tokens
+    const { tokens } = await client.getToken(code);
+    const idToken = tokens.id_token;
+
+    // Verify the ID token
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
 
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture } = payload;
@@ -279,7 +281,7 @@ export const googleAuth = async (req, res) => {
         const updateQuery = `
           UPDATE users SET 
             google_id = $1, 
-            profile_picture = $2, 
+            profile_picture = COALESCE(profile_picture, $2), 
             updated_at = NOW() 
           WHERE id = $3 
           RETURNING *
@@ -302,7 +304,7 @@ export const googleAuth = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user);
 
-    // Return user data
+    // Return user data with token
     res.json({
       success: true,
       message: 'Google authentication successful',
@@ -312,7 +314,7 @@ export const googleAuth = async (req, res) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profile_picture,
-        token: token
+        token: token  // Include token in user object
       }
     });
 
@@ -320,7 +322,7 @@ export const googleAuth = async (req, res) => {
     console.error('Google auth error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error during Google authentication'
+      message: 'Google authentication failed'
     });
   }
 };

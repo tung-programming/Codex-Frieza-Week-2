@@ -22,14 +22,14 @@ import LoadingSpinner from './components/LoadingSpinner'
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     // Redirect to auth page but remember where they tried to go
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
@@ -45,10 +45,10 @@ function PublicRoute({ children }) {
     return <LoadingSpinner />;
   }
 
-  if (isAuthenticated) {
-    // If already authenticated, redirect to gallery
-    return <Navigate to="/gallery" replace />;
-  }
+  // if (isAuthenticated) {
+  //   // If already authenticated, redirect to gallery
+  //   return <Navigate to="/gallery" replace />;
+  // }
 
   return children;
 }

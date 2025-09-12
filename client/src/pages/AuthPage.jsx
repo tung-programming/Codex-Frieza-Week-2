@@ -125,16 +125,20 @@ function AuthPage() {
   };
 
   const handleGoogleSignIn = useGoogleLogin({
-    // This now has logging
     onSuccess: async (codeResponse) => {
       console.log('✅ Google login SUCCESS. Received code:', codeResponse.code);
       try {
-        await googleLogin(codeResponse.code);
+        const result = await googleLogin(codeResponse.code);
+        if (result.success) {
+          // Navigate to gallery after successful login
+          navigate('/gallery');
+        } else {
+          console.error('Failed to complete Google login');
+        }
       } catch (error) {
         console.error('❌ Frontend Error: Failed to send code to backend.', error);
       }
     },
-    // Also add an error handler
     onError: (error) => {
       console.error('❌ Google login FAILED:', error);
     },

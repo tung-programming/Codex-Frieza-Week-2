@@ -194,18 +194,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const googleLogin = useCallback(async (idToken) => {
+  const googleLogin = useCallback(async (code) => {
     try {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
-
-      const response = await authService.googleLogin(idToken);
+  
+      const response = await authService.googleLogin(code);
       
       if (response.success) {
         dispatch({
           type: AUTH_ACTIONS.LOGIN_SUCCESS,
           payload: {
             user: response.user,
-            token: authService.getToken()
+            token: response.user.token // Use token from response.user
           }
         });
         return { success: true };

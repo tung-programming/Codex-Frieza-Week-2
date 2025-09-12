@@ -138,11 +138,28 @@ class AuthService {
 
   // Google OAuth login
   async googleLogin(code) {
-    const response = await apiService.post('/auth/google', { code });
-    if (response.success) {
-      this.setAuth(response.token, response.user);
+    try {
+      // Client-side validation
+      if (!code) {
+        throw new Error('Google authorization code is required');
+      }
+  
+      const response = await this.apiRequest('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+      });
+  
+      if (response.success) {
+        // Set auth data just like regular login
+        this.setAuthData(response.user);
+        return { success: true, user: response.user };
+      } else {
+        throw new Error(response.message || 'Google login failed');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      return { success: false, message: error.message };
     }
-    return response;
   }
 
   // Get current user
