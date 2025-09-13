@@ -759,21 +759,38 @@ function ImageDetailPage() {
           {/* Comments */}
           <div style={{ marginTop: '1rem' }}>
             <strong>Comments</strong>
-            <ul>
+            <ul style={{ marginTop: '0.5rem' }}>
               {image.comments?.map(c => (
-                <li key={c.id}><b>{c.username}:</b> {c.content}</li>
+                <li key={c.id}>
+                  <b>{c.username}:</b> {c.content}
+                </li>
               ))}
             </ul>
+
             {user && (
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                const content = e.target.comment.value;
-                await apiService.addComment(id, content);
-                const updated = await apiService.getComments(id);
-                setImage({ ...image, comments: updated.comments });
-                e.target.reset();
-              }}>
-                <input name="comment" placeholder="Write a comment..." className="form-input" />
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const content = e.target.comment.value.trim();
+                  if (!content) return;
+
+                  try {
+                    await imageService.addComment(id, content);
+                    const updated = await imageService.getComments(id);
+                    setImage({ ...image, comments: updated.comments });
+                    e.target.reset();
+                  } catch (err) {
+                    alert(err.message || "Failed to add comment");
+                  }
+                }}
+                style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}
+              >
+                <input
+                  name="comment"
+                  placeholder="Write a comment..."
+                  className="form-input"
+                  style={{ flex: 1 }}
+                />
                 <button type="submit" className="btn btn-secondary">Post</button>
               </form>
             )}
