@@ -6,81 +6,62 @@ import { fileURLToPath } from 'url';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-import fs from 'fs';
-import multer from 'multer';
 // Import routes
 import authRoutes from './routes/auth.js';
 import imageRoutes from './routes/images.js';
 import albumRoutes from './routes/albums.js';
-
 // Import database connection
 import db from './config/db.js';
-
 // Configure environment variables
 dotenv.config();
-
 const app = express();
+app.use(
+  cors({
+    origin: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  })
+);
 const __filename = fileURLToPath(import.meta.url);
+// Serve uploads folder as static
 const __dirname = path.resolve();
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const PORT = process.env.PORT || 5001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-
-// --- Middleware Setup ---
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, name);
-  }
-});
-const upload = multer({ storage });
-
-// Example single-file route
-app.post('/api/images', upload.single('images'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file' });
-
-    // IMPORTANT: store the path in DB with a leading slash
-    const storagePath = `/uploads/${req.file.filename}`;   // <- used by frontend to build URL
-    const thumbnailPath = storagePath; // or compute a thumbnail path
-
-    // save storagePath/thumbnailPath in DB (your insert code)
-    // e.g. await db.query('INSERT INTO images (storage_path, thumbnail_path, ...) VALUES ($1,$2,...)', [storagePath,thumbnailPath]);
-
-    return res.json({ success: true, storage_path: storagePath, thumbnail_path: thumbnailPath });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Upload failed' });
-  }
-});
+const allowedOrigins = ['http://localhost:5173']; // React dev server
 // Security middleware
 app.use(helmet({
-  crossOriginEmbedderPolicy: false, // Allow embedding images
+  crossOriginOpenerPolicy: {policy: "same-origin-allow-popups"}, // This is the fix
+  crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "blob:", "https://*.googleusercontent.com"], // Allow Google profile images
-      connectSrc: ["'self'"],
+      scriptSrc: ["'self'", "apis.google.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'", "accounts.google.com"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameSrc: ["'self'", "accounts.google.com"],
     },
   },
 }));
-
-// These headers might be needed for certain OAuth pop-up flows
+// Add this after the helmet middleware configuration:
 app.use((req, res, next) => {
   res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   res.header('Cross-Origin-Embedder-Policy', 'unsafe-none');
   next();
 });
-
-// CORS middleware (Consolidated)
+// Compression middleware
+app.use(compression());
+// Logging middleware
+if (NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
+// CORS middleware
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -100,17 +81,6 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 app.use(cors(corsOptions));
-
-// Compression middleware
-app.use(compression());
-
-// Logging middleware
-if (NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
-
 // Body parsing middleware
 app.use(express.json({
   limit: '50mb',
@@ -122,42 +92,34 @@ app.use(express.urlencoded({
   extended: true,
   limit: '50mb'
 }));
-
-// Trust proxy (important for rate limiting and IP detection in production)
+// Trust proxy (important for rate limiting and IP detection)
 if (NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
-
-// --- Directory and Static File Setup ---
-
 // Create uploads directory if it doesn't exist
+import fs from 'fs';
 const uploadsDir = path.join(__dirname, 'uploads');
 const thumbnailsDir = path.join(uploadsDir, 'thumbnails');
-
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 if (!fs.existsSync(thumbnailsDir)) {
   fs.mkdirSync(thumbnailsDir, { recursive: true });
 }
-
-// Serve static files (uploaded images) with caching (Consolidated)
+// Serve static files (uploaded images)
 app.use('/uploads', express.static(uploadsDir, {
-  maxAge: NODE_ENV === 'production' ? '7d' : '1h', // Cache images for 7 days in prod
+  maxAge: NODE_ENV === 'production' ? '7d' : '1h', // Cache images
   etag: true,
   lastModified: true
 }));
-
-
-// --- API Routes ---
-
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/albums', albumRoutes);
-
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
+    // Test database connection
     const dbResult = await db.query('SELECT NOW() as server_time');
     res.json({
       success: true,
@@ -175,6 +137,8 @@ app.get('/api/health', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Service partially unavailable',
+      timestamp: new Date().toISOString(),
+      environment: NODE_ENV,
       database: {
         connected: false,
         error: error.message
@@ -182,43 +146,86 @@ app.get('/api/health', async (req, res) => {
     });
   }
 });
-
-// Simple API documentation endpoint
+// API documentation endpoint (simple)
 app.get('/api/docs', (req, res) => {
-    // ... (Your documentation JSON)
+  res.json({
+    success: true,
+    message: 'PixelVault API Documentation',
+    version: '1.0.0',
+    endpoints: {
+      authentication: {
+        'POST /api/auth/register': 'Register new user',
+        'POST /api/auth/login': 'Login user',
+        'POST /api/auth/google': 'Google OAuth login',
+        'GET /api/auth/me': 'Get current user (requires auth)',
+        'PUT /api/auth/change-password': 'Change password (requires auth)'
+      },
+      images: {
+        'GET /api/images': 'Get images with optional filters',
+        'POST /api/images': 'Upload images (requires auth)',
+        'GET /api/images/stats': 'Get image statistics',
+        'GET /api/images/:id': 'Get single image',
+        'PUT /api/images/:id': 'Update image metadata (requires auth)',
+        'DELETE /api/images/:id': 'Delete image (requires auth)'
+      },
+      albums: {
+        'GET /api/albums': 'Get all albums',
+        'POST /api/albums': 'Create album (requires auth)',
+        'GET /api/albums/:id': 'Get single album with images',
+        'PUT /api/albums/:id': 'Update album (requires auth)',
+        'DELETE /api/albums/:id': 'Delete album (requires auth)'
+      }
+    }
+  });
 });
-
-
-// --- Error Handling and 404 ---
-
-// Generic error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', {
     error: err.message,
     stack: NODE_ENV === 'development' ? err.stack : undefined,
     url: req.url,
     method: req.method,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
   });
-
+  // CORS error
   if (err.message === 'Not allowed by CORS') {
-    return res.status(403).json({ success: false, message: 'CORS policy violation' });
+    return res.status(403).json({
+      success: false,
+      message: 'CORS policy violation',
+      error: NODE_ENV === 'development' ? err.message : undefined
+    });
   }
+  // JWT error
   if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-    return res.status(401).json({ success: false, message: 'Authentication failed' });
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication failed',
+      error: NODE_ENV === 'development' ? err.message : undefined
+    });
   }
+  // File upload error
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(413).json({ success: false, message: 'File too large' });
+    return res.status(413).json({
+      success: false,
+      message: 'File too large'
+    });
   }
+  // Database error
   if (err.code && err.code.startsWith('23')) { // PostgreSQL constraint violations
-    return res.status(400).json({ success: false, message: 'Database constraint violation' });
+    return res.status(400).json({
+      success: false,
+      message: 'Database constraint violation',
+      error: NODE_ENV === 'development' ? err.message : undefined
+    });
   }
-
+  // Default error response
   res.status(err.status || 500).json({
     success: false,
     message: NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    error: NODE_ENV === 'development' ? err.stack : undefined
   });
 });
-
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
   res.status(404).json({
@@ -227,72 +234,128 @@ app.use('/api/*', (req, res) => {
     available_endpoints: '/api/docs'
   });
 });
-
-
-// --- Serve Frontend in Production ---
-
+// Serve frontend in production
 if (NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../client/dist');
-
   if (fs.existsSync(frontendPath)) {
     app.use(express.static(frontendPath));
-    // Handle client-side routing by sending index.html for any other request
+    // Handle client-side routing
     app.get('*', (req, res) => {
       res.sendFile(path.join(frontendPath, 'index.html'));
     });
   } else {
-    console.log('Warning: Frontend build directory not found at', frontendPath);
     app.get('*', (req, res) => {
       res.status(404).json({
         success: false,
-        message: 'Frontend not built or not found.'
+        message: 'Frontend not built. Run npm run build first.'
       });
     });
   }
 }
-
-// --- Server Startup Logic ---
-
+// Test database connection on startup
 const testConnection = async () => {
   try {
-    const result = await db.query('SELECT NOW()');
-    console.log('✅ Database connected successfully at:', result.rows[0].now);
+    const result = await db.query('SELECT NOW() as current_time, version() as postgres_version');
+    console.log('✅ Database connected successfully');
+    console.log(`📊 PostgreSQL Version: ${result.rows[0].postgres_version.split(' ')[0]}`);
+    console.log(`🕐 Database time: ${result.rows[0].current_time}`);
+    // Test if required tables exist
+    const tablesResult = await db.query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+      AND table_name IN ('users', 'images', 'albums')
+    `);
+    const requiredTables = ['users', 'images', 'albums'];
+    const existingTables = tablesResult.rows.map(row => row.table_name);
+    const missingTables = requiredTables.filter(table => !existingTables.includes(table));
+    if (missingTables.length > 0) {
+      console.log(`⚠️ Missing required tables: ${missingTables.join(', ')}`);
+      console.log('Run the database migration script to create missing tables.');
+    } else {
+      console.log('✅ All required database tables exist');
+    }
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
     console.error('Please check your database configuration in .env file');
     if (NODE_ENV === 'production') {
-      process.exit(1); // Exit if DB connection fails in production
+      process.exit(1);
+    } else {
+      console.log('⚠️ Continuing in development mode without database...');
     }
   }
 };
-
-const startServer = async () => {
-  await testConnection();
-  app.listen(PORT, () => {
-    console.log(`\n🚀 Server listening on http://localhost:${PORT}`);
-    console.log(`   Environment: ${NODE_ENV}`);
-    console.log('   Press Ctrl+C to stop');
-  });
-};
-
-startServer().catch(err => {
-    console.error("❌ Failed to start server:", err);
-    process.exit(1);
-});
-
 // Graceful shutdown handling
 const gracefulShutdown = (signal) => {
-  console.log(`\n🔄 Received ${signal}. Shutting down gracefully...`);
-  db.end().then(() => {
-    console.log('PostgreSQL pool has been closed.');
-    process.exit(0);
-  }).catch(err => {
-    console.error('Error closing database pool:', err);
-    process.exit(1);
-  });
+  console.log(`\n🔄 Received ${signal}. Starting graceful shutdown...`);
+  // Close database connections
+  if (db.end) {
+    db.end().catch(err => console.error('Error closing database:', err));
+  }
+  console.log('👋 PixelVault server shut down gracefully');
+  process.exit(0);
 };
-
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+// Unhandled rejection and exception handling
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't crash the server, but log it
+});
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  gracefulShutdown('UNCAUGHT_EXCEPTION');
+});
+// Start server
+const startServer = async () => {
+  try {
+    await testConnection();
+    const server = app.listen(PORT, () => {
+      console.log('\n🚀 PixelVault Server Started Successfully!');
+      console.log('=====================================');
+      console.log(`📱 Environment: ${NODE_ENV}`);
+      console.log(`🌐 Server: http://localhost:${PORT}`);
+      console.log(`🔧 Health Check: http://localhost:${PORT}/api/health`);
+      console.log(`📚 API Docs: http://localhost:${PORT}/api/docs`);
+      console.log(`📁 Static Files: ${path.join(__dirname, 'uploads')}`);
+      console.log('\n🔗 Available API Endpoints:');
+      console.log('   Authentication:');
+      console.log('   POST /api/auth/register     - Register new user');
+      console.log('   POST /api/auth/login        - Login user');
+      console.log('   POST /api/auth/google       - Google OAuth login');
+      console.log('   GET  /api/auth/me           - Get current user');
+      console.log('   PUT  /api/auth/change-password - Change password');
+      console.log('   Images:');
+      console.log('   GET    /api/images          - Get images with filters');
+      console.log('   POST   /api/images          - Upload images');
+      console.log('   GET    /api/images/stats    - Get image statistics');
+      console.log('   GET    /api/images/:id      - Get single image');
+      console.log('   PUT    /api/images/:id      - Update image metadata');
+      console.log('   DELETE /api/images/:id      - Delete image');
+      console.log('   Albums:');
+      console.log('   GET    /api/albums          - Get all albums');
+      console.log('   POST   /api/albums          - Create album');
+      console.log('   GET    /api/albums/:id      - Get single album');
+      console.log('   PUT    /api/albums/:id      - Update album');
+      console.log('   DELETE /api/albums/:id      - Delete album');
+      console.log('\n🔒 Environment Variables Required:');
+      const requiredEnvVars = [
+        'DB_USER', 'DB_HOST', 'DB_DATABASE', 'DB_PASSWORD', 'DB_PORT',
+        'JWT_SECRET', 'GOOGLE_CLIENT_ID'
+      ];
+      requiredEnvVars.forEach(varName => {
+        const status = process.env[varName] ? '✅' : '❌';
+        console.log(`   ${status} ${varName}`);
+      });
+      console.log('\n🎯 Ready to accept requests!');
+    });
+    // Set server timeout
+    server.timeout = 30000; // 30 seconds
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 
-export default app;
+};
+startServer();
+export default app; 

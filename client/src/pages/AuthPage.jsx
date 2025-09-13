@@ -28,11 +28,11 @@ function AuthPage() {
   const { login, register, isAuthenticated, error: authError, clearError } = useAuth();
 
   // Redirect if already authenticated
-//  useEffect(() => {
-//    if (isAuthenticated) {
-//      navigate('/gallery');
-//    }
-//  }, [isAuthenticated, navigate]);
+ useEffect(() => {
+   if (isAuthenticated) {
+     navigate('/gallery');
+   }
+ }, [isAuthenticated, navigate]);
 
   // Clear auth errors when component mounts or mode changes
   useEffect(() => {
