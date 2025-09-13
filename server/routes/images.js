@@ -8,6 +8,13 @@ import {
   updateImage,
   deleteImage,
   getImageStats,
+  likeImage,
+  unlikeImage,
+  getLikes,
+  addComment,
+  getComments,
+  addTagsToImage,
+  getTagsForImage
 } from '../controllers/imageController.js';
 import { protect, optionalAuth, editorOrAdmin } from '../middleware/authMiddleware.js';
 
@@ -44,5 +51,18 @@ router.route('/:id')
   .get(optionalAuth, getImageById)
   .put(protect, updateImage)
   .delete(protect, deleteImage);
+
+  // Likes
+router.post('/:id/like', protect, likeImage);
+router.delete('/:id/like', protect, unlikeImage);
+router.get('/:id/likes', optionalAuth, getLikes);
+  
+  // Comments
+router.post('/:id/comments', protect, addComment);
+router.get('/:id/comments', optionalAuth, getComments);
+  
+  // Tags
+router.post('/:id/tags', protect, addTagsToImage);
+router.get('/:id/tags', optionalAuth, getTagsForImage);
 
 export default router;

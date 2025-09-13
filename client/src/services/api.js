@@ -113,6 +113,32 @@ class ApiService {
       return { success: false, message: 'API unavailable' };
     }
   }
+  // Likes
+async likeImage(id) {
+  return this.post(`/images/${id}/like`);
+}
+async unlikeImage(id) {
+  return this.delete(`/images/${id}/like`);
+}
+async getLikes(id) {
+  return this.get(`/images/${id}/likes`);
+}
+
+// Comments
+async addComment(id, content) {
+  return this.post(`/images/${id}/comments`, { content });
+}
+async getComments(id) {
+  return this.get(`/images/${id}/comments`);
+}
+
+// Tags
+async addTags(id, tags) {
+  return this.post(`/images/${id}/tags`, { tags });
+}
+async getTags(id) {
+  return this.get(`/images/${id}/tags`);
+}
 }
 
 // Create singleton instance

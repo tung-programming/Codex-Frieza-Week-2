@@ -91,6 +91,37 @@ class ImageService {
     const promises = imageIds.map(id => this.deleteImage(id));
     return await Promise.all(promises);
   }
+  // --- Likes ---
+  async likeImage(id) {
+    return await apiService.post(`/images/${id}/like`);
+  }
+
+  async unlikeImage(id) {
+    return await apiService.delete(`/images/${id}/like`);
+  }
+
+  async getLikes(id) {
+    return await apiService.get(`/images/${id}/likes`);
+  }
+
+  // --- Comments ---
+  async addComment(id, content) {
+    return await apiService.post(`/images/${id}/comments`, { content });
+  }
+
+  async getComments(id) {
+    return await apiService.get(`/images/${id}/comments`);
+  }
+
+  // --- Tags ---
+  async addTags(id, tags) {
+    return await apiService.post(`/images/${id}/tags`, { tags });
+  }
+
+  async getTags(id) {
+    return await apiService.get(`/images/${id}/tags`);
+  }
+
 
   // Get image URL for display
   getImageUrl(imagePath, baseUrl = 'https://pixel-vault-ct82.onrender.com') {

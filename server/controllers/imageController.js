@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
 import exifParser from 'exif-parser';
 import { fileURLToPath } from 'url';
+import multer from "multer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -474,4 +475,130 @@ export const getImageStats = async (req, res) => {
             message: 'Server error' 
         });
     }
+};
+
+// --- Likes --- //
+export const likeImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query(
+      'INSERT INTO likes (image_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+      [id, req.user.id]
+    );
+    res.json({ success: true, message: 'Image liked' });
+  } catch (error) {
+    console.error('Like error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const unlikeImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query(
+      'DELETE FROM likes WHERE image_id = $1 AND user_id = $2',
+      [id, req.user.id]
+    );
+    res.json({ success: true, message: 'Image unliked' });
+  } catch (error) {
+    console.error('Unlike error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const getLikes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await db.query(
+      'SELECT COUNT(*) AS like_count FROM likes WHERE image_id = $1',
+      [id]
+    );
+    res.json({ success: true, likeCount: parseInt(rows[0].like_count) });
+  } catch (error) {
+    console.error('Get likes error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// --- Comments --- //
+export const addComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    if (!content || !content.trim()) {
+      return res.status(400).json({ success: false, message: 'Comment cannot be empty' });
+    }
+    const { rows } = await db.query(
+      `INSERT INTO comments (content, image_id, user_id) 
+       VALUES ($1, $2, $3) RETURNING *`,
+      [content, id, req.user.id]
+    );
+    res.status(201).json({ success: true, comment: rows[0] });
+  } catch (error) {
+    console.error('Add comment error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const getComments = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await db.query(
+      `SELECT c.*, u.username 
+       FROM comments c 
+       JOIN users u ON c.user_id = u.id 
+       WHERE c.image_id = $1 
+       ORDER BY c.created_at DESC`,
+      [id]
+    );
+    res.json({ success: true, comments: rows });
+  } catch (error) {
+    console.error('Get comments error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// --- Tags --- //
+export const addTagsToImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tags } = req.body; // array of tag names
+    if (!Array.isArray(tags)) {
+      return res.status(400).json({ success: false, message: 'Tags must be an array' });
+    }
+
+    for (const tagName of tags) {
+      const { rows } = await db.query(
+        `INSERT INTO tags (name) VALUES ($1) 
+         ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id`,
+        [tagName.trim().toLowerCase()]
+      );
+      const tagId = rows[0].id;
+      await db.query(
+        'INSERT INTO image_tags (image_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [id, tagId]
+      );
+    }
+    res.json({ success: true, message: 'Tags added' });
+  } catch (error) {
+    console.error('Add tags error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const getTagsForImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await db.query(
+      `SELECT t.* 
+       FROM image_tags it 
+       JOIN tags t ON it.tag_id = t.id 
+       WHERE it.image_id = $1`,
+      [id]
+    );
+    res.json({ success: true, tags: rows });
+  } catch (error) {
+    console.error('Get tags error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 };

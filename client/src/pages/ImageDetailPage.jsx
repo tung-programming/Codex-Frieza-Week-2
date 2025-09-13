@@ -706,6 +706,63 @@ function ImageDetailPage() {
           </div>
         )}
       </div>
+      {/* Likes, Comments, and Tags */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">Engagement</h3>
+        </div>
+        <div className="card-body">
+          {/* Likes */}
+          <button onClick={async () => {
+            if (!user) return alert('Login required');
+            if (image.userLiked) {
+              await apiService.unlikeImage(id);
+              setImage({ ...image, userLiked: false, likeCount: image.likeCount - 1 });
+            } else {
+              await apiService.likeImage(id);
+              setImage({ ...image, userLiked: true, likeCount: (image.likeCount || 0) + 1 });
+            }
+          }} className="btn btn-primary">
+            ❤️ {image.likeCount || 0}
+          </button>
+
+          {/* Tags */}
+          <div style={{ marginTop: '1rem' }}>
+            <strong>Tags: </strong>
+            {image.tags?.length
+              ? image.tags.map(tag => (
+                  <span key={tag.id} style={{ marginRight: '0.5rem', color: 'var(--primary-cyan)' }}>
+                    #{tag.name}
+                  </span>
+                ))
+              : <span>No tags</span>}
+          </div>
+
+          {/* Comments */}
+          <div style={{ marginTop: '1rem' }}>
+            <strong>Comments</strong>
+            <ul>
+              {image.comments?.map(c => (
+                <li key={c.id}><b>{c.username}:</b> {c.content}</li>
+              ))}
+            </ul>
+            {user && (
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                const content = e.target.comment.value;
+                await apiService.addComment(id, content);
+                const updated = await apiService.getComments(id);
+                setImage({ ...image, comments: updated.comments });
+                e.target.reset();
+              }}>
+                <input name="comment" placeholder="Write a comment..." className="form-input" />
+                <button type="submit" className="btn btn-secondary">Post</button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
