@@ -18,18 +18,15 @@ Managing digital images is often messy — scattered files, no proper albums, li
 - **Authentication System**: JWT-based auth with Google OAuth support
 - **Role-based Access Control**: Admin, Editor, and Visitor roles
 - **Image Management**: Upload, edit, delete, and organize images
-- **Album System**: Create and manage photo albums
-- **Advanced Search**: Search by title, caption, metadata, and tags
 - **Responsive Design**: Works on desktop and mobile devices
-- **Image Processing**: Automatic thumbnail generation and EXIF data extraction
 - **Modern UI**: Cyberpunk-themed interface with animations
 - Secure login/logout with **JWT authentication**.  
 - User roles:  
   - **Visitor** → View public content.  
   - **Editor** → Upload & manage their content.  
   - **Admin** → Full control over all content and users.  
-### 🖼 Image & Album Management  
-- ❤️ Like & 💬 Comment on images (UI in place).
+### 🖼 Image Management  
+- Likes ❤️ and Comments 💬 will be available **only in the image detail view** (after clicking on an image).
 - 📤 Upload multiple images with drag-and-drop.  
 - 📝 Edit image title/caption.  
 - 🗑 **Delete images** (Admin/Editor).  
