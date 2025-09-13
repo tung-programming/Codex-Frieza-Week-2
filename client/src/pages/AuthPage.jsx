@@ -126,17 +126,25 @@ function AuthPage() {
 
   // Replace the existing handleGoogleSignIn with this:
   const handleGoogleSignIn = useGoogleLogin({
-    flow: 'implicit', // default
+    flow: 'implicit',
     onSuccess: async (tokenResponse) => {
       try {
-        // exchange access token for ID token
-        const userInfoResponse = await fetch(
-          `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokenResponse.access_token}`
+        // Exchange access_token for ID token
+        const tokenInfoResponse = await fetch(
+          `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${tokenResponse.access_token}`
         );
-        const userInfo = await userInfoResponse.json();
+        const tokenInfo = await tokenInfoResponse.json();
   
-        // send only the ID token to backend (not access token)
-        const result = await googleLogin(tokenResponse.credential);
+        // This contains the ID token
+        const idToken = tokenInfo.id_token;
+  
+        if (!idToken) {
+          console.error("❌ No ID token received from Google");
+          return;
+        }
+  
+        // ✅ Send ID token to backend
+        const result = await googleLogin(idToken);
   
         if (result.success) {
           navigate('/gallery');
