@@ -43,10 +43,26 @@ function ImageDetailPage() {
   const loadImage = async () => {
     try {
       setLoading(true);
+  
+      // fetch image
       const response = await imageService.getImageById(id);
-      
+  
       if (response.success) {
-        setImage(response.image);
+        // parallel fetch likes, comments, tags
+        const [likesRes, commentsRes, tagsRes] = await Promise.all([
+          imageService.getLikes(id),
+          imageService.getComments(id),
+          imageService.getTags(id)
+        ]);
+  
+        setImage({
+          ...response.image,
+          likeCount: likesRes.likeCount || 0,
+          userLiked: false, // optional: track if this user liked it (can expand later)
+          comments: commentsRes.comments || [],
+          tags: tagsRes.tags || []
+        });
+  
         setFormData({
           title: response.image.title || '',
           caption: response.image.caption || '',
@@ -64,6 +80,7 @@ function ImageDetailPage() {
       setLoading(false);
     }
   };
+  
 
   // Load albums for dropdown
   const loadAlbums = async () => {
@@ -715,11 +732,12 @@ function ImageDetailPage() {
           {/* Likes */}
           <button onClick={async () => {
             if (!user) return alert('Login required');
+
             if (image.userLiked) {
-              await apiService.unlikeImage(id);
-              setImage({ ...image, userLiked: false, likeCount: image.likeCount - 1 });
+              await imageService.unlikeImage(id);
+              setImage({ ...image, userLiked: false, likeCount: (image.likeCount || 1) - 1 });
             } else {
-              await apiService.likeImage(id);
+              await imageService.likeImage(id);
               setImage({ ...image, userLiked: true, likeCount: (image.likeCount || 0) + 1 });
             }
           }} className="btn btn-primary">
