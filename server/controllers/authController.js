@@ -233,28 +233,23 @@ export const getCurrentUser = async (req, res) => {
 
 export const googleAuth = async (req, res) => {
   try {
-    const { accessToken, userInfo } = req.body;
+    const { credential } = req.body; // `credential` is the ID token from Google frontend SDK
 
-    if (!accessToken || !userInfo) {
+    if (!credential) {
       return res.status(400).json({
         success: false,
-        message: 'Google access token and user info are required'
+        message: 'Google ID token is required'
       });
     }
 
-    // Verify the access token with Google
-    const verifyResponse = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
-    const tokenInfo = await verifyResponse.json();
+    // Verify token with Google
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
 
-    if (!verifyResponse.ok || tokenInfo.error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid Google access token'
-      });
-    }
-
-    const { email, name, picture } = userInfo;
-    const googleId = userInfo.id;
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
 
     if (!email) {
       return res.status(400).json({
@@ -263,22 +258,20 @@ export const googleAuth = async (req, res) => {
       });
     }
 
-    // Check if user already exists
+    // Check if user exists
     const existingUserQuery = 'SELECT * FROM users WHERE email = $1 OR google_id = $2';
     const existingUserResult = await db.query(existingUserQuery, [email, googleId]);
 
     let user;
-
     if (existingUserResult.rows.length > 0) {
-      // User exists, update Google ID if not set
       user = existingUserResult.rows[0];
 
       if (!user.google_id) {
         const updateQuery = `
-          UPDATE users SET 
-            google_id = $1, 
-            profile_picture = COALESCE(profile_picture, $2), 
-            updated_at = NOW() 
+          UPDATE users 
+          SET google_id = $1, 
+              profile_picture = COALESCE(profile_picture, $2), 
+              updated_at = NOW() 
           WHERE id = $3 
           RETURNING *
         `;
@@ -286,7 +279,6 @@ export const googleAuth = async (req, res) => {
         user = updateResult.rows[0];
       }
     } else {
-      // Create new user
       const username = name || email.split('@')[0];
       const insertQuery = `
         INSERT INTO users (username, email, google_id, profile_picture, role, created_at, updated_at)
@@ -297,10 +289,9 @@ export const googleAuth = async (req, res) => {
       user = insertResult.rows[0];
     }
 
-    // Generate JWT token
+    // Generate JWT
     const token = generateToken(user);
 
-    // Return user data with token
     res.json({
       success: true,
       message: 'Google authentication successful',
@@ -310,7 +301,7 @@ export const googleAuth = async (req, res) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profile_picture,
-        token: token
+        token
       }
     });
 

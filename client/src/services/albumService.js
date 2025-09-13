@@ -99,7 +99,7 @@ class AlbumService {
   }
 
   // Get album cover URL
-  getAlbumCoverUrl(album, baseUrl = 'http://localhost:5001') {
+  getAlbumCoverUrl(album, baseUrl = 'https://pixel-vault-ct82.onrender.com') {
     if (album.cover_thumbnail) {
       return `${baseUrl}${album.cover_thumbnail}`;
     }
