@@ -1,7 +1,18 @@
-# PixelVault - Modern Image Gallery Platform
+# 🌃 PixelVault - Modern Image Gallery Platform  
 
-A full-stack image gallery application with authentication, album management, and advanced search capabilities.
+A full-stack image gallery application with **robust authentication**, **intuitive album management**, and **advanced search capabilities**, all wrapped in a stunning **cyberpunk-themed interface**.  
 
+🚀 **Live Demo:** [PixelVault on Render](https://pixelvault-jpy0.onrender.com/)  
+
+---
+
+## ❓ Problem Statement  
+
+Managing digital images is often messy — scattered files, no proper albums, limited sharing, and poor search capabilities.  
+
+**PixelVault** solves this by providing a **modern, secure, and feature-rich gallery platform** where users can upload, manage, and explore images with ease.  
+
+---
 ## 🚀 Features
 
 - **Authentication System**: JWT-based auth with Google OAuth support
@@ -12,6 +23,23 @@ A full-stack image gallery application with authentication, album management, an
 - **Responsive Design**: Works on desktop and mobile devices
 - **Image Processing**: Automatic thumbnail generation and EXIF data extraction
 - **Modern UI**: Cyberpunk-themed interface with animations
+- Secure login/logout with **JWT authentication**.  
+- User roles:  
+  - **Visitor** → View public content.  
+  - **Editor** → Upload & manage their content.  
+  - **Admin** → Full control over all content and users.  
+### 🖼 Image & Album Management  
+- ❤️ Like & 💬 Comment on images (UI in place).
+- 📤 Upload multiple images with drag-and-drop.  
+- 📝 Edit image title/caption.  
+- 🗑 **Delete images** (Admin/Editor).  
+- 📂 **Create, move, and manage albums**.  
+- ⬇️ **Download images** with one click.  
+
+### 🔍 Search & Explore  
+- Keyword search across **titles, captions, and tags**.  
+- Filters by **album** and **date**.  
+
 
 ## 🛠 Tech Stack
 
