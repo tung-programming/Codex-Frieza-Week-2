@@ -327,9 +327,24 @@ function AuthPage() {
           <div className="divider">
             <span className="divider-text">OR</span>
           </div>
-
+          <div style={{ marginTop: "1.5rem" }}>
+            <button
+              className="google-btn"
+              onClick={() => {
+                window.google.accounts.id.prompt(); // Opens Google's popup
+              }}
+            >
+              <img
+                className="google-icon"
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google Logo"
+              />
+              Sign in with Google
+            </button>
+          </div>
           {/* Google Sign In */}
-          <div style={{ marginTop: "1rem" }}>
+          <div style={{ display: "none" }}>
+
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 try {
