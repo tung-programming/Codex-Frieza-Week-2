@@ -43,6 +43,7 @@ Managing digital images is often messy — scattered files, no proper albums, li
 
 ## Demo Video
 
+- Large video wait for some time!!
 - https://drive.google.com/file/d/1Cb5E3VgnyYufAXU5_zNTNwp9McNT7zDQ/view?usp=sharing
 
 ## 🛠 Tech Stack
