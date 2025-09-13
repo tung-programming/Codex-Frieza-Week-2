@@ -28,7 +28,9 @@ function GalleryPage() {
   const dropZoneRef = useRef(null);
   const navigate = useNavigate();
 
-  const API_BASE = 'https://pixel-vault-ct82.onrender.com/api';
+  const API_BASE = import.meta.env.VITE_API_URL || 'https://pixel-vault-ct82.onrender.com/api';
+  const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || 'https://pixel-vault-ct82.onrender.com';
+
 
   // Get token from localStorage
   const getToken = () => {
@@ -289,7 +291,7 @@ function GalleryPage() {
   // Download image
   const downloadImage = async (image) => {
     try {
-      const response = await fetch(`https://pixel-vault-ct82.onrender.com${image.storage_path}`);
+      const response = await fetch(`${BACKEND_BASE}${image.storage_path}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -483,9 +485,10 @@ function GalleryPage() {
               <div key={image.id} className="image-card">
                 <div className="image-card-image">
                   <img
-                    src={`https://pixel-vault-ct82.onrender.com${image.thumbnail_path}`}
+                    src={`${BACKEND_BASE}${image.thumbnail_path}`}
                     alt={image.alt_text || image.title}
                     loading="lazy"
+                    className="w-full h-48 object-cover rounded-t-lg"
                   />
                   <div className="image-card-overlay">
                     <button
@@ -826,7 +829,7 @@ function GalleryPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={`https://pixel-vault-ct82.onrender.com${images[lightboxIndex]?.storage_path}`}
+                src={`${BACKEND_BASE}${images[lightboxIndex]?.storage_path}`}
                 alt={images[lightboxIndex]?.alt_text || images[lightboxIndex]?.title}
                 style={{
                   maxWidth: '100%',

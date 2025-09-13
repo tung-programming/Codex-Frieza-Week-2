@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import fs from 'fs';
-
+import multer from 'multer';
 // Import routes
 import authRoutes from './routes/auth.js';
 import imageRoutes from './routes/images.js';
@@ -27,7 +27,34 @@ const PORT = process.env.PORT || 5001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // --- Middleware Setup ---
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, name);
+  }
+});
+const upload = multer({ storage });
 
+// Example single-file route
+app.post('/api/images', upload.single('images'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file' });
+
+    // IMPORTANT: store the path in DB with a leading slash
+    const storagePath = `/uploads/${req.file.filename}`;   // <- used by frontend to build URL
+    const thumbnailPath = storagePath; // or compute a thumbnail path
+
+    // save storagePath/thumbnailPath in DB (your insert code)
+    // e.g. await db.query('INSERT INTO images (storage_path, thumbnail_path, ...) VALUES ($1,$2,...)', [storagePath,thumbnailPath]);
+
+    return res.json({ success: true, storage_path: storagePath, thumbnail_path: thumbnailPath });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Upload failed' });
+  }
+});
 // Security middleware
 app.use(helmet({
   crossOriginEmbedderPolicy: false, // Allow embedding images
