@@ -783,6 +783,7 @@ function ImageDetailPage() {
                     alert(err.message || "Failed to add comment");
                   }
                 }}
+                className="comment-form"
                 style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}
               >
                 <input

@@ -183,3 +183,21 @@
     max-height: 80vh !important;
   }
 }
+
+/* Mobile-only adjustments */
+@media (max-width: 600px) {
+  .comment-form {
+    flex-direction: column;
+    /* stack input & button vertically */
+    align-items: stretch;
+  }
+
+  .comment-form input {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .comment-form button {
+    width: 100%;
+  }
+}
