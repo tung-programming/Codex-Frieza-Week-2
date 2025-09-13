@@ -28,11 +28,11 @@ function AuthPage() {
   const { login, register, isAuthenticated, error: authError, clearError } = useAuth();
 
   // Redirect if already authenticated
-//  useEffect(() => {
-//    if (isAuthenticated) {
-//      navigate('/gallery');
-//    }
-//  }, [isAuthenticated, navigate]);
+ useEffect(() => {
+   if (isAuthenticated) {
+     navigate('/gallery');
+   }
+ }, [isAuthenticated, navigate]);
 
   // Clear auth errors when component mounts or mode changes
   useEffect(() => {
@@ -125,33 +125,33 @@ function AuthPage() {
   };
 
   // Replace the existing handleGoogleSignIn with this:
-const handleGoogleSignIn = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    console.log('✅ Google login SUCCESS. Received token:', tokenResponse.access_token);
-    try {
-      // Get user info from Google using the access token
-      const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.access_token}`);
-      const userInfo = await userInfoResponse.json();
-      
-      const result = await googleLogin({
-        idToken: tokenResponse.access_token,
-        userInfo: userInfo
-      });
-      
-      if (result.success) {
-        navigate('/gallery');
-      } else {
-        console.error('Failed to complete Google login');
+  const handleGoogleSignIn = useGoogleLogin({
+    flow: 'implicit', // default
+    onSuccess: async (tokenResponse) => {
+      try {
+        // exchange access token for ID token
+        const userInfoResponse = await fetch(
+          `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokenResponse.access_token}`
+        );
+        const userInfo = await userInfoResponse.json();
+  
+        // send only the ID token to backend (not access token)
+        const result = await googleLogin(tokenResponse.credential);
+  
+        if (result.success) {
+          navigate('/gallery');
+        } else {
+          console.error('Failed to complete Google login');
+        }
+      } catch (error) {
+        console.error('❌ Frontend Error: Failed to process Google login.', error);
       }
-    } catch (error) {
-      console.error('❌ Frontend Error: Failed to process Google login.', error);
-    }
-  },
-  onError: (error) => {
-    console.error('❌ Google login FAILED:', error);
-  },
-  // Remove the flow: 'auth-code' line - use default implicit flow
-});
+    },
+    onError: (error) => {
+      console.error('❌ Google login FAILED:', error);
+    },
+  });
+  
 
   const toggleMode = () => {
     setIsLogin(!isLogin);

@@ -28,8 +28,8 @@ function GalleryPage() {
   const dropZoneRef = useRef(null);
   const navigate = useNavigate();
 
-  const API_BASE = 'http://localhost:5001/api';
-
+  // const API_BASE = 'http://localhost:5001/api';
+  const API_BASE = 'https://pixel-vault-ct82.onrender.com/api';
   // Get token from localStorage
   const getToken = () => {
     const userData = localStorage.getItem('user');
